@@ -4,16 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="be55eb0f-7b06-44d8-a548-894b33accc34" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/ISMS/src/main/resources/static/js/products.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/ISMS/src/main/resources/static/js/stock.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/ISMS/src/main/resources/static/js/suppliers.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ISMS/src/main/resources/static/css/style.css" beforeDir="false" afterPath="$PROJECT_DIR$/ISMS/src/main/resources/static/css/style.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ISMS/src/main/resources/static/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/ISMS/src/main/resources/static/index.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ISMS/src/main/resources/static/products.html" beforeDir="false" afterPath="$PROJECT_DIR$/ISMS/src/main/resources/static/products.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ISMS/src/main/resources/static/stock.html" beforeDir="false" afterPath="$PROJECT_DIR$/ISMS/src/main/resources/static/stock.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ISMS/src/main/resources/static/suppliers.html" beforeDir="false" afterPath="$PROJECT_DIR$/ISMS/src/main/resources/static/suppliers.html" afterDir="false" />
-    </list>
+    <list default="true" id="be55eb0f-7b06-44d8-a548-894b33accc34" name="Changes" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -61,7 +52,7 @@
     "RunOnceActivity.git.unshallow": "true",
     "RunOnceActivity.typescript.service.memoryLimit.init": "true",
     "codeWithMe.voiceChat.enabledByDefault": "false",
-    "git-widget-placeholder": "feat-html",
+    "git-widget-placeholder": "main",
     "kotlin-language-version-configured": "true",
     "last_opened_file_path": "D:/OJT_BT/Framework/-Inventory-SupplierManagementSystem",
     "node.js.detected.package.eslint": "true",
@@ -87,7 +78,7 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1792217605687</updated>
-      <workItem from="1792217606941" duration="1350000" />
+      <workItem from="1792217606941" duration="1671000" />
     </task>
     <servers />
   </component>
