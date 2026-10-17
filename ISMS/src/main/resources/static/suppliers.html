@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Suppliers - Inventory Management</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+<div class="container-fluid">
+    <div class="row">
+        <nav class="col-md-3 col-lg-2 bg-dark sidebar p-3">
+            <h4 class="text-white">Inventory</h4>
+            <ul class="nav flex-column">
+                <li class="nav-item">
+                    <a class="nav-link text-white" href="index.html">Dashboard</a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link text-white" href="products.html">Products</a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link text-white" href="suppliers.html">Suppliers</a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link text-white" href="stock.html">Stock Movements</a>
+                </li>
+            </ul>
+        </nav>
+
+
+        <main class="col-md-9 col-lg-10 p-4">
+            <div class="d-flex justify-content-between align-items-center">
+                <h2>Suppliers</h2>
+                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addSupplierModal">Add Supplier</button>
+            </div>
+            <p>Manage your suppliers</p>
+<!--Searchbar-->
+            <div class="card p-3 mt-4">
+                <input type="text" class="form-control mb-3" placeholder="Search suppliers...">
+
+                <div class="table-responsive">
+                    <table class="table table-hover">
+
+                        <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Supplier Name</th>
+                            <th>Email</th>
+                            <th>Phone</th>
+                            <th>Actions</th>
+                        </tr>
+                        </thead>
+                        <tbody id="supplierTableBody">
+                        </tbody>
+                        <!--This is where suppliers are shown. There must be a delete and edit button, but suppliers must be added-->
+
+                        <!--EXAMPLE SUPPLIER-->
+                        <!--                        <tr>-->
+                        <!--                            <td>1</td>-->
+                        <!--                            <td>Company X</td>-->
+                        <!--                            <td>example@gmail.com</td>-->
+                        <!--                            <td>0xxxxxxxx</td>-->
+                        <!--                            <td>-->
+                        <!--                                <button class="btn btn-warning btn-sm">Edit</button>-->
+                        <!--                                <button class="btn btn-danger btn-sm">Delete</button>-->
+                        <!--                            </td>-->
+                        <!--                        </tr>-->
+
+
+                    </table>
+                </div>
+
+            </div>
+        </main>
+
+        <div class="modal fade" id="addSupplierModal" tabindex="-1">
+            <div class="modal-dialog">
+                <div class="modal-content">
+
+                    <div class="modal-header">
+                        <h5 class="modal-title">Add Supplier</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal">
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="addSupplierForm">
+                            <div class="mb-3">
+                                <label class="form-label">Supplier Name</label>
+                                <input type="text" class="form-control" name="supplier_name" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Email</label>
+                                <input type="email" class="form-control" name="email" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Phone</label>
+                                <input type="tel" class="form-control" name="phone" required>
+                            </div>
+                            <button type="submit" class="btn btn-primary">Save Supplier</button>
+                        </form>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+
+    </div>
+</div>
+
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

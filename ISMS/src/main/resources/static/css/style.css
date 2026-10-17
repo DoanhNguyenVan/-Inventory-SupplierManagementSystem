@@ -1,0 +1,44 @@
+
+body {
+    background-color: #f5f6fa;
+    font-family: Arial, sans-serif;
+}
+
+nav {
+    background-color: #212529;
+}
+
+.nav-link {
+    padding: 12px;
+    border-radius: 5px;
+    margin-bottom: 5px;
+}
+
+.nav-link:hover {
+    background-color: #495057;
+}
+
+.card {
+    border: none;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.card h5 {
+    color: #6c757d;
+}
+
+.card h2 {
+    font-weight: bold;
+    margin-top: 10px;
+}
+
+.sidebar {
+    min-height: 100vh;
+}
+
+@media (max-width: 767.98px) {
+    .sidebar {
+        min-height: auto;
+    }
+}

@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Products - Inventory Management</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+<div class="container-fluid">
+    <div class="row">
+        <nav class="col-md-3 col-lg-2 bg-dark sidebar p-3">
+            <h4 class="text-white">Inventory</h4>
+            <ul class="nav flex-column">
+                <li class="nav-item">
+                    <a class="nav-link text-white" href="index.html">Dashboard</a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link text-white" href="products.html">Products</a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link text-white" href="suppliers.html">Suppliers</a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link text-white" href="stock.html">Stock Movements</a>
+                </li>
+            </ul>
+        </nav>
+
+
+        <main class="col-md-9 col-lg-10 p-4">
+
+            <div class="d-flex justify-content-between align-items-center">
+                <h2>Products</h2>
+                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addProductModal">Add Product</button>
+            </div>
+            <p>Manage your inventory products</p>
+            <div class="card p-3 mt-4">
+                <!--Searchbar-->
+                <input type="text" class="form-control mb-3" placeholder="Search products...">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+
+                        <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Product Name</th>
+                            <th>Supplier</th>
+                            <th>Quantity</th>
+                            <th>Actions</th>
+                        </tr>
+                        </thead>
+                        <tbody id="productTableBody">
+                        </tbody>
+<!--This is where products are shown. There must be a delete and edit button, but products must be added-->
+
+                        <!--EXAMPLE PRODUCT-->
+<!--                        <tr>-->
+<!--                            <td>1</td>-->
+<!--                            <td>Product A</td>-->
+<!--                            <td>Company X</td>-->
+<!--                            <td>25</td>-->
+<!--                            <td>-->
+<!--                                <button class="btn btn-warning btn-sm">Edit</button>-->
+<!--                                <button class="btn btn-danger btn-sm">Delete</button>-->
+<!--                            </td>-->
+<!--                        </tr>-->
+
+
+                    </table>
+                </div>
+
+            </div>
+        </main>
+
+        <div class="modal fade" id="addProductModal" tabindex="-1">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Add Product</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="addProductForm">
+                            <div class="mb-3">
+                                <label class="form-label">Product Name</label>
+                                <input type="text" class="form-control" name="product_name" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Supplier</label>
+                                <select class="form-select" name="supplier_id" required>
+                                    <option value="">Select Supplier</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Quantity</label>
+                                <input type="number" class="form-control" name="quantity_in_stock" min="0" required>
+                            </div>
+                            <button type="submit" class="btn btn-primary">Save Product</button>
+                        </form>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+
+    </div>
+</div>
+
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
