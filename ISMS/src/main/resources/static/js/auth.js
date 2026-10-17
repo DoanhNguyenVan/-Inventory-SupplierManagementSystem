@@ -1,9 +1,4 @@
-// ==========================================================
-// File: auth.js - Authentication & Session Management
-// ==========================================================
-
 const Auth = {
-    // Check if user is logged in
     getUser: function () {
         const userStr = localStorage.getItem("isms_user");
         if (!userStr) return null;
@@ -23,7 +18,6 @@ const Auth = {
         localStorage.removeItem("isms_user");
     },
 
-    // Guard protected pages
     requireAuth: function () {
         const user = this.getUser();
         if (!user) {
@@ -33,7 +27,6 @@ const Auth = {
         this.renderUserBadge(user);
     },
 
-    // Redirect to dashboard if already logged in on login/register pages
     redirectIfLoggedIn: function () {
         const user = this.getUser();
         if (user) {
@@ -41,12 +34,10 @@ const Auth = {
         }
     },
 
-    // Render user profile and logout button in sidebar
     renderUserBadge: function (user) {
         const sidebar = document.querySelector(".sidebar");
         if (!sidebar) return;
 
-        // Check if user badge already rendered
         if (document.getElementById("sidebarUserProfile")) return;
 
         const profileDiv = document.createElement("div");
@@ -79,7 +70,6 @@ const Auth = {
         });
     },
 
-    // Login API call
     login: async function (username, password) {
         const response = await fetch("/api/auth/login", {
             method: "POST",
@@ -95,7 +85,6 @@ const Auth = {
         }
     },
 
-    // Register API call
     register: async function (userData) {
         const response = await fetch("/api/auth/register", {
             method: "POST",
@@ -111,7 +100,6 @@ const Auth = {
         }
     },
 
-    // Logout API call
     logout: async function () {
         try {
             await fetch("/api/auth/logout", { method: "POST" });

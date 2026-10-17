@@ -25,7 +25,7 @@ public class User {
     private String email;
 
     @Column(name = "role", length = 20)
-    private String role; // e.g. "ADMIN", "STAFF", "USER"
+    private String role;
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;
@@ -52,7 +52,6 @@ public class User {
         }
     }
 
-    // Getters and Setters
     public Long getUserId() {
         return userId;
     }

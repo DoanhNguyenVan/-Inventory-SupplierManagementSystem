@@ -9,7 +9,9 @@ import com.Group5.ISMS.util.PasswordUtil;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class UserService {
@@ -40,9 +42,7 @@ public class UserService {
         }
 
         String hashedPassword = PasswordUtil.hashPassword(request.getPassword());
-        String role = (request.getRole() != null && !request.getRole().trim().isEmpty())
-                ? request.getRole().trim().toUpperCase()
-                : "USER";
+        String role = "USER";
 
         User user = new User(
                 username,
@@ -66,7 +66,6 @@ public class UserService {
 
         String identifier = request.getUsername().trim();
 
-        // Allow login by username OR email
         Optional<User> userOpt = userRepository.findByUsername(identifier);
         if (userOpt.isEmpty()) {
             userOpt = userRepository.findByEmail(identifier);
@@ -91,5 +90,63 @@ public class UserService {
 
     public Optional<UserDto> findByUsername(String username) {
         return userRepository.findByUsername(username).map(UserDto::new);
+    }
+
+    public List<UserDto> getAllUsers() {
+        return userRepository.findAll()
+                .stream()
+                .map(UserDto::new)
+                .collect(Collectors.toList());
+    }
+
+    public List<UserDto> searchUsers(String keyword) {
+        if (keyword == null || keyword.trim().isEmpty()) {
+            return getAllUsers();
+        }
+        String clean = keyword.trim();
+        return userRepository.findByUsernameContainingIgnoreCaseOrFullNameContainingIgnoreCaseOrEmailContainingIgnoreCase(clean, clean, clean)
+                .stream()
+                .map(UserDto::new)
+                .collect(Collectors.toList());
+    }
+
+    @Transactional
+    public UserDto updateUserRole(Long targetUserId, String newRole, Long currentAdminId) {
+        if (newRole == null || newRole.trim().isEmpty()) {
+            throw new IllegalArgumentException("Role is required");
+        }
+        String normalizedRole = newRole.trim().toUpperCase();
+        if (!normalizedRole.equals("ADMIN") && !normalizedRole.equals("STAFF") && !normalizedRole.equals("USER")) {
+            throw new IllegalArgumentException("Invalid role. Permitted roles: ADMIN, STAFF, USER");
+        }
+
+        User targetUser = userRepository.findById(targetUserId)
+                .orElseThrow(() -> new IllegalArgumentException("User not found with id: " + targetUserId));
+
+        if ("ADMIN".equals(targetUser.getRole()) && !"ADMIN".equals(normalizedRole)) {
+            if (userRepository.countByRole("ADMIN") <= 1) {
+                throw new IllegalArgumentException("Cannot demote the last remaining Administrator in the system");
+            }
+        }
+
+        targetUser.setRole(normalizedRole);
+        User updated = userRepository.save(targetUser);
+        return new UserDto(updated);
+    }
+
+    @Transactional
+    public void deleteUser(Long targetUserId, Long currentAdminId) {
+        if (targetUserId.equals(currentAdminId)) {
+            throw new IllegalArgumentException("You cannot delete your own logged-in account");
+        }
+
+        User targetUser = userRepository.findById(targetUserId)
+                .orElseThrow(() -> new IllegalArgumentException("User not found with id: " + targetUserId));
+
+        if ("ADMIN".equals(targetUser.getRole()) && userRepository.countByRole("ADMIN") <= 1) {
+            throw new IllegalArgumentException("Cannot delete the last remaining Administrator");
+        }
+
+        userRepository.delete(targetUser);
     }
 }

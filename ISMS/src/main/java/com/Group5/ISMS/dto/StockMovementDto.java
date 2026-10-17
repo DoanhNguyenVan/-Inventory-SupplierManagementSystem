@@ -10,6 +10,8 @@ public class StockMovementDto {
     private String productName;
     private Integer quantityChange;
     private LocalDateTime movementDate;
+    private Long userId;
+    private String performedBy;
 
     public StockMovementDto() {
     }
@@ -23,6 +25,14 @@ public class StockMovementDto {
             }
             this.quantityChange = sm.getQuantityChange();
             this.movementDate = sm.getMovementDate();
+            if (sm.getUser() != null) {
+                this.userId = sm.getUser().getUserId();
+                this.performedBy = (sm.getUser().getFullName() != null && !sm.getUser().getFullName().trim().isEmpty())
+                        ? sm.getUser().getFullName()
+                        : sm.getUser().getUsername();
+            } else {
+                this.performedBy = "System";
+            }
         }
     }
 
@@ -64,5 +74,21 @@ public class StockMovementDto {
 
     public void setMovementDate(LocalDateTime movementDate) {
         this.movementDate = movementDate;
+    }
+
+    public Long getUserId() {
+        return userId;
+    }
+
+    public void setUserId(Long userId) {
+        this.userId = userId;
+    }
+
+    public String getPerformedBy() {
+        return performedBy;
+    }
+
+    public void setPerformedBy(String performedBy) {
+        this.performedBy = performedBy;
     }
 }

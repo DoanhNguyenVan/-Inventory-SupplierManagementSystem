@@ -5,14 +5,16 @@ public class DashboardStatsDto {
     private long totalProducts;
     private long totalSuppliers;
     private long lowStockCount;
+    private long totalMovements;
 
     public DashboardStatsDto() {
     }
 
-    public DashboardStatsDto(long totalProducts, long totalSuppliers, long lowStockCount) {
+    public DashboardStatsDto(long totalProducts, long totalSuppliers, long lowStockCount, long totalMovements) {
         this.totalProducts = totalProducts;
         this.totalSuppliers = totalSuppliers;
         this.lowStockCount = lowStockCount;
+        this.totalMovements = totalMovements;
     }
 
     public long getTotalProducts() {
@@ -37,5 +39,13 @@ public class DashboardStatsDto {
 
     public void setLowStockCount(long lowStockCount) {
         this.lowStockCount = lowStockCount;
+    }
+
+    public long getTotalMovements() {
+        return totalMovements;
+    }
+
+    public void setTotalMovements(long totalMovements) {
+        this.totalMovements = totalMovements;
     }
 }

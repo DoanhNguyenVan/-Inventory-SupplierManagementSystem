@@ -4,11 +4,32 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="be55eb0f-7b06-44d8-a548-894b33accc34" name="Changes" comment="" />
+    <list default="true" id="be55eb0f-7b06-44d8-a548-894b33accc34" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ISMS/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/ISMS/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ISMS/src/main/java/com/Group5/ISMS/controller/AuthController.java" beforeDir="false" afterPath="$PROJECT_DIR$/ISMS/src/main/java/com/Group5/ISMS/controller/AuthController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ISMS/src/main/java/com/Group5/ISMS/dto/DashboardStatsDto.java" beforeDir="false" afterPath="$PROJECT_DIR$/ISMS/src/main/java/com/Group5/ISMS/dto/DashboardStatsDto.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ISMS/src/main/java/com/Group5/ISMS/repository/UserRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/ISMS/src/main/java/com/Group5/ISMS/repository/UserRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ISMS/src/main/java/com/Group5/ISMS/service/UserService.java" beforeDir="false" afterPath="$PROJECT_DIR$/ISMS/src/main/java/com/Group5/ISMS/service/UserService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ISMS/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/ISMS/src/main/resources/application.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ISMS/src/main/resources/static/js/products.js" beforeDir="false" afterPath="$PROJECT_DIR$/ISMS/src/main/resources/static/js/products.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ISMS/src/main/resources/static/js/stock.js" beforeDir="false" afterPath="$PROJECT_DIR$/ISMS/src/main/resources/static/js/stock.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ISMS/src/main/resources/static/js/suppliers.js" beforeDir="false" afterPath="$PROJECT_DIR$/ISMS/src/main/resources/static/js/suppliers.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ISMS/src/main/resources/templates/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/ISMS/src/main/resources/templates/index.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ISMS/src/main/resources/templates/products.html" beforeDir="false" afterPath="$PROJECT_DIR$/ISMS/src/main/resources/templates/products.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ISMS/src/main/resources/templates/register.html" beforeDir="false" afterPath="$PROJECT_DIR$/ISMS/src/main/resources/templates/register.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ISMS/src/main/resources/templates/stock.html" beforeDir="false" afterPath="$PROJECT_DIR$/ISMS/src/main/resources/templates/stock.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ISMS/src/main/resources/templates/suppliers.html" beforeDir="false" afterPath="$PROJECT_DIR$/ISMS/src/main/resources/templates/suppliers.html" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="CopilotPersistence">
+    <persistenceIdMap>
+      <entry key="_C:/Users/ADMIN/Downloads/Inventory-SupplierManagementSystem" value="3KoIgZWdvXH3Em0PNxtSBMhrqBa" />
+    </persistenceIdMap>
   </component>
   <component name="EmbeddingIndexingInfo">
     <option name="cachedIndexableFilesCount" value="19" />
@@ -16,26 +37,26 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
-  <component name="GitHubPullRequestSearchHistory"><![CDATA[{
-  "lastFilter": {
-    "state": "OPEN",
-    "assignee": "gdragon18"
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;gdragon18&quot;
   }
-}]]></component>
-  <component name="GithubPullRequestsUISettings"><![CDATA[{
-  "selectedUrlAndAccountId": {
-    "url": "https://github.com/DoanhNguyenVan/-Inventory-SupplierManagementSystem.git",
-    "accountId": "02b5652e-0d97-4fdd-8a32-741186b28679"
+}</component>
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/DoanhNguyenVan/-Inventory-SupplierManagementSystem.git&quot;,
+    &quot;accountId&quot;: &quot;02b5652e-0d97-4fdd-8a32-741186b28679&quot;
   }
-}]]></component>
+}</component>
   <component name="McpProjectServerCommands">
     <commands />
     <urls />
   </component>
-  <component name="ProjectColorInfo"><![CDATA[{
-  "associatedIndex": 6,
-  "fromUser": false
-}]]></component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 6,
+  &quot;fromUser&quot;: false
+}</component>
   <component name="ProjectId" id="3KoIgZWdvXH3Em0PNxtSBMhrqBa" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
@@ -51,10 +72,12 @@
     "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
     "RunOnceActivity.git.unshallow": "true",
     "RunOnceActivity.typescript.service.memoryLimit.init": "true",
+    "Spring Boot.IsmsApplication.executor": "Run",
     "codeWithMe.voiceChat.enabledByDefault": "false",
-    "git-widget-placeholder": "main",
+    "copilot.chat.legacySessionMetadata.migrated": "true",
+    "git-widget-placeholder": "luhan",
     "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "D:/OJT_BT/Framework/-Inventory-SupplierManagementSystem",
+    "last_opened_file_path": "C:/Users/ADMIN/Downloads/Inventory-SupplierManagementSystem",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",

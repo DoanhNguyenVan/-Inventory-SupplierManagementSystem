@@ -13,10 +13,6 @@ public class PasswordUtil {
     private static final int KEY_LENGTH = 256;
     private static final String ALGORITHM = "PBKDF2WithHmacSHA256";
 
-    /**
-     * Hashes raw password using PBKDF2 with salt.
-     * Returns encoded string in format: salt:hash
-     */
     public static String hashPassword(String password) {
         if (password == null || password.trim().isEmpty()) {
             throw new IllegalArgumentException("Password cannot be empty");
@@ -34,9 +30,6 @@ public class PasswordUtil {
         return saltBase64 + ":" + hashBase64;
     }
 
-    /**
-     * Verifies raw password against the stored salt:hash string.
-     */
     public static boolean verifyPassword(String rawPassword, String storedHash) {
         if (rawPassword == null || storedHash == null || !storedHash.contains(":")) {
             return false;

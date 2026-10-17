@@ -36,7 +36,6 @@ public class Supplier {
         this.phone = phone;
     }
 
-    // Getters and Setters
     public Long getSupplierId() {
         return supplierId;
     }

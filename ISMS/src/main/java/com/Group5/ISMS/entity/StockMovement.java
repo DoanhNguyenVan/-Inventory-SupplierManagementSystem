@@ -18,6 +18,11 @@ public class StockMovement {
     @JsonIgnoreProperties("stockMovements")
     private Product product;
 
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "user_id")
+    @JsonIgnoreProperties("password")
+    private User user;
+
     @Column(name = "quantity_change", nullable = false)
     private Integer quantityChange;
 
@@ -28,9 +33,14 @@ public class StockMovement {
     }
 
     public StockMovement(Product product, Integer quantityChange, LocalDateTime movementDate) {
+        this(product, quantityChange, movementDate, null);
+    }
+
+    public StockMovement(Product product, Integer quantityChange, LocalDateTime movementDate, User user) {
         this.product = product;
         this.quantityChange = quantityChange;
         this.movementDate = movementDate != null ? movementDate : LocalDateTime.now();
+        this.user = user;
     }
 
     @PrePersist
@@ -40,7 +50,6 @@ public class StockMovement {
         }
     }
 
-    // Getters and Setters
     public Long getMovementId() {
         return movementId;
     }
@@ -71,5 +80,13 @@ public class StockMovement {
 
     public void setMovementDate(LocalDateTime movementDate) {
         this.movementDate = movementDate;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
     }
 }

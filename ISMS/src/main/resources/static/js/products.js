@@ -1,30 +1,39 @@
-// ==========================================================
-// File: products.js - Interactivity & API CRUD for Products
-// ==========================================================
-
 document.addEventListener("DOMContentLoaded", function () {
-    // 1. Guard page authentication
-    if (window.Auth) {
-        Auth.requireAuth();
+    const tableBody = document.getElementById("productTableBody");
+    const searchInput = document.querySelector("input[placeholder*='Search products']");
+    const addProductForm = document.getElementById("addProductForm");
+    const editProductForm = document.getElementById("editProductForm");
+    const addSupplierSelect = document.getElementById("productSupplierSelect");
+    const editSupplierSelect = document.getElementById("editProductSupplierSelect");
+
+    const addModalEl = document.getElementById("addProductModal");
+    const addModal = addModalEl ? (bootstrap.Modal.getInstance(addModalEl) || new bootstrap.Modal(addModalEl)) : null;
+
+    const editModalEl = document.getElementById("editProductModal");
+    const editModal = editModalEl ? (bootstrap.Modal.getInstance(editModalEl) || new bootstrap.Modal(editModalEl)) : null;
+
+    const viewModalEl = document.getElementById("viewProductModal");
+    const viewModal = viewModalEl ? (bootstrap.Modal.getInstance(viewModalEl) || new bootstrap.Modal(viewModalEl)) : null;
+
+    const userRole = (window.CURRENT_USER_ROLE || "USER").toUpperCase();
+    const isReadOnly = (userRole === "USER");
+
+    let productsList = [];
+    let suppliersList = [];
+
+    loadProducts();
+    if (!isReadOnly) {
+        loadSuppliersDropdown();
     }
 
-    const tableBody = document.getElementById("productTableBody");
-    const searchInput = document.querySelector("input[placeholder='Search products...']");
-    const addProductForm = document.getElementById("addProductForm");
-    const supplierSelect = document.getElementById("productSupplierSelect");
-
-    // Load initial data
-    loadProducts();
-    loadSuppliersDropdown();
-
-    // 2. Fetch and render products from backend
     async function loadProducts() {
         if (!tableBody) return;
         try {
             const res = await fetch("/api/products");
             const data = await res.json();
             if (res.ok && data.success) {
-                renderTable(data.data);
+                productsList = data.data;
+                renderTable(productsList);
             } else {
                 tableBody.innerHTML = `<tr><td colspan="6" class="text-center text-danger py-4">${data.message || 'Error loading products'}</td></tr>`;
             }
@@ -33,75 +42,154 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     }
 
-    // Render table rows
     function renderTable(products) {
         if (!products || products.length === 0) {
-            tableBody.innerHTML = `<tr><td colspan="6" class="text-center text-muted py-4">No products found. Click "Add Product" to create one.</td></tr>`;
+            tableBody.innerHTML = `<tr><td colspan="6" class="text-center text-muted py-4">No products found.</td></tr>`;
             return;
         }
 
         tableBody.innerHTML = products.map(p => {
-            const isLowStock = p.quantityInStock < 10;
-            const badge = isLowStock 
-                ? `<span class="badge badge-low-stock">Low Stock (${p.quantityInStock})</span>`
-                : `<span class="badge badge-stock-in">In Stock (${p.quantityInStock})</span>`;
+            const qty = (p.quantityInStock != null) ? p.quantityInStock : 0;
+
+            let rowClass = "";
+            let badge = "";
+
+            if (qty === 0) {
+                rowClass = "row-out-of-stock";
+                badge = `<span class="badge badge-out-of-stock"><i class="bi bi-x-circle me-1"></i>Out of Stock (0)</span>`;
+            } else if (qty <= 5) {
+                rowClass = "row-low-stock";
+                badge = `<span class="badge badge-low-stock"><i class="bi bi-exclamation-triangle me-1"></i>Low Stock (${qty})</span>`;
+            } else {
+                rowClass = "";
+                badge = `<span class="badge badge-stock-in"><i class="bi bi-check-circle me-1"></i>In Stock (${qty})</span>`;
+            }
+
+            let actionButtonsHtml = "";
+            if (isReadOnly) {
+                actionButtonsHtml = `
+                    <button class="btn btn-outline-info btn-sm btn-view" 
+                            data-id="${p.productId}" 
+                            title="View Details">
+                        <i class="bi bi-eye"></i> Details
+                    </button>
+                `;
+            } else {
+                actionButtonsHtml = `
+                    <button class="btn btn-outline-info btn-sm btn-view me-1" 
+                            data-id="${p.productId}" 
+                            title="View Details">
+                        <i class="bi bi-eye"></i>
+                    </button>
+                    <button class="btn btn-outline-primary btn-sm btn-edit me-1" 
+                            data-id="${p.productId}" 
+                            data-name="${escapeHtml(p.productName)}" 
+                            data-supplier-id="${p.supplierId || ''}" 
+                            data-quantity="${qty}"
+                            title="Edit Product">
+                        <i class="bi bi-pencil"></i> Edit
+                    </button>
+                    <button class="btn btn-outline-danger btn-sm btn-delete" 
+                            data-id="${p.productId}" 
+                            data-name="${escapeHtml(p.productName)}" 
+                            title="Delete Product">
+                        <i class="bi bi-trash"></i> Delete
+                    </button>
+                `;
+            }
 
             return `
-                <tr data-id="${p.productId}">
+                <tr class="${rowClass}" data-id="${p.productId}">
                     <td><strong>#${p.productId}</strong></td>
-                    <td class="fw-semibold">${p.productName}</td>
-                    <td>${p.supplierName ? `<span class="text-primary">${p.supplierName}</span>` : '<span class="text-muted">None</span>'}</td>
-                    <td>${p.quantityInStock}</td>
+                    <td class="fw-semibold">${escapeHtml(p.productName)}</td>
+                    <td>${p.supplierName ? `<span class="text-primary fw-medium">${escapeHtml(p.supplierName)}</span>` : '<span class="text-muted">Unassigned</span>'}</td>
+                    <td><strong class="fs-6">${qty}</strong></td>
                     <td>${badge}</td>
-                    <td>
-                        <button class="btn btn-outline-danger btn-sm btn-delete" data-id="${p.productId}" title="Delete Product">
-                            <i class="bi bi-trash"></i> Delete
-                        </button>
+                    <td class="text-end">
+                        ${actionButtonsHtml}
                     </td>
                 </tr>
             `;
         }).join("");
     }
 
-    // 3. Fetch suppliers to populate dropdown
     async function loadSuppliersDropdown() {
-        if (!supplierSelect) return;
         try {
             const res = await fetch("/api/suppliers");
             const data = await res.json();
             if (res.ok && data.success) {
-                supplierSelect.innerHTML = `<option value="">No Supplier Assigned</option>` +
-                    data.data.map(s => `<option value="${s.supplierId}">${s.supplierName}</option>`).join("");
+                suppliersList = data.data;
+                const options = `<option value="">-- Select Supplier --</option>` +
+                    suppliersList.map(s => `<option value="${s.supplierId}">${escapeHtml(s.supplierName)}</option>`).join("");
+                if (addSupplierSelect) addSupplierSelect.innerHTML = options;
+                if (editSupplierSelect) editSupplierSelect.innerHTML = options;
             }
         } catch (e) {
-            console.error("Failed to load suppliers for dropdown", e);
+            console.error("Error loading suppliers dropdown:", e);
         }
     }
 
-    // 4. Live search filter on table rows
-    if (searchInput && tableBody) {
+    if (searchInput) {
         searchInput.addEventListener("input", function () {
             const keyword = searchInput.value.toLowerCase().trim();
-            const rows = tableBody.querySelectorAll("tr");
-
-            rows.forEach(function (row) {
-                const text = row.innerText.toLowerCase();
-                if (text.includes(keyword)) {
-                    row.style.display = "";
-                } else {
-                    row.style.display = "none";
-                }
-            });
+            const filtered = productsList.filter(p =>
+                (p.productName && p.productName.toLowerCase().includes(keyword)) ||
+                (p.supplierName && p.supplierName.toLowerCase().includes(keyword)) ||
+                String(p.productId).includes(keyword)
+            );
+            renderTable(filtered);
         });
     }
 
-    // 5. Delete product with confirmation
     if (tableBody) {
         tableBody.addEventListener("click", async function (event) {
+            const viewBtn = event.target.closest(".btn-view");
+            if (viewBtn) {
+                const id = viewBtn.getAttribute("data-id");
+                const p = productsList.find(item => String(item.productId) === String(id));
+                if (p && viewModal) {
+                    const qty = (p.quantityInStock != null) ? p.quantityInStock : 0;
+                    document.getElementById("viewProductId").textContent = `#${p.productId}`;
+                    document.getElementById("viewProductName").textContent = p.productName || "—";
+                    document.getElementById("viewProductSupplier").textContent = p.supplierName || "No supplier assigned";
+                    document.getElementById("viewProductQuantity").textContent = qty;
+
+                    if (qty === 0) {
+                        document.getElementById("viewProductStatus").innerHTML = `<span class="badge badge-out-of-stock"><i class="bi bi-x-circle me-1"></i>Out of Stock (0)</span>`;
+                    } else if (qty <= 5) {
+                        document.getElementById("viewProductStatus").innerHTML = `<span class="badge badge-low-stock"><i class="bi bi-exclamation-triangle me-1"></i>Low Stock (${qty})</span>`;
+                    } else {
+                        document.getElementById("viewProductStatus").innerHTML = `<span class="badge badge-stock-in"><i class="bi bi-check-circle me-1"></i>In Stock (${qty})</span>`;
+                    }
+
+                    viewModal.show();
+                }
+                return;
+            }
+
+            const editBtn = event.target.closest(".btn-edit");
+            if (editBtn && !isReadOnly) {
+                const id = editBtn.getAttribute("data-id");
+                const name = editBtn.getAttribute("data-name");
+                const supplierId = editBtn.getAttribute("data-supplier-id");
+                const quantity = editBtn.getAttribute("data-quantity");
+
+                document.getElementById("editProductId").value = id;
+                document.getElementById("editProductName").value = name;
+                document.getElementById("editProductQuantity").value = quantity;
+                if (editSupplierSelect) {
+                    editSupplierSelect.value = supplierId || "";
+                }
+
+                if (editModal) editModal.show();
+                return;
+            }
+
             const deleteBtn = event.target.closest(".btn-delete");
-            if (deleteBtn) {
+            if (deleteBtn && !isReadOnly) {
                 const id = deleteBtn.getAttribute("data-id");
-                if (confirm(`Are you sure you want to delete Product #${id}?`)) {
+                const name = deleteBtn.getAttribute("data-name");
+                if (confirm(`Are you sure you want to delete product "${name}" (#${id})?`)) {
                     try {
                         const res = await fetch(`/api/products/${id}`, { method: "DELETE" });
                         const data = await res.json();
@@ -111,27 +199,25 @@ document.addEventListener("DOMContentLoaded", function () {
                             alert(data.message || "Failed to delete product");
                         }
                     } catch (e) {
-                        alert("Error connecting to server to delete product.");
+                        alert("Error connecting to server while deleting product.");
                     }
                 }
             }
         });
     }
 
-    // 6. Handle Add Product form submit
-    if (addProductForm) {
+    if (addProductForm && !isReadOnly) {
         addProductForm.addEventListener("submit", async function (event) {
             event.preventDefault();
             const productName = addProductForm.product_name.value.trim();
             const supplierIdVal = addProductForm.supplier_id.value;
-            const quantity = parseInt(addProductForm.quantity_in_stock.value, 10);
 
             if (!productName) {
                 alert("Please enter a product name!");
                 return;
             }
-            if (isNaN(quantity) || quantity < 0) {
-                alert("Quantity cannot be negative!");
+            if (!supplierIdVal) {
+                alert("A supplier must be selected for this product!");
                 return;
             }
 
@@ -141,25 +227,69 @@ document.addEventListener("DOMContentLoaded", function () {
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({
                         productName: productName,
-                        supplierId: supplierIdVal ? parseInt(supplierIdVal, 10) : null,
-                        quantityInStock: quantity
+                        supplierId: parseInt(supplierIdVal, 10),
+                        quantityInStock: 0
                     })
                 });
                 const data = await res.json();
                 if (res.ok && data.success) {
                     addProductForm.reset();
-                    // Close bootstrap modal
-                    const modalEl = document.getElementById("addProductModal");
-                    const modalInstance = bootstrap.Modal.getInstance(modalEl) || new bootstrap.Modal(modalEl);
-                    modalInstance.hide();
-                    // Refresh table
+                    if (addModal) addModal.hide();
                     loadProducts();
                 } else {
                     alert(data.message || "Failed to create product");
                 }
             } catch (e) {
-                alert("Error connecting to server to save product.");
+                alert("Error connecting to server while saving product.");
             }
         });
+    }
+
+    if (editProductForm && !isReadOnly) {
+        editProductForm.addEventListener("submit", async function (event) {
+            event.preventDefault();
+            const id = document.getElementById("editProductId").value;
+            const productName = document.getElementById("editProductName").value.trim();
+            const supplierIdVal = document.getElementById("editProductSupplierSelect").value;
+
+            if (!productName) {
+                alert("Please enter a product name!");
+                return;
+            }
+            if (!supplierIdVal) {
+                alert("A supplier must be selected!");
+                return;
+            }
+
+            try {
+                const res = await fetch(`/api/products/${id}`, {
+                    method: "PUT",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        productName: productName,
+                        supplierId: parseInt(supplierIdVal, 10)
+                    })
+                });
+                const data = await res.json();
+                if (res.ok && data.success) {
+                    if (editModal) editModal.hide();
+                    loadProducts();
+                } else {
+                    alert(data.message || "Failed to update product");
+                }
+            } catch (e) {
+                alert("Error connecting to server while updating product.");
+            }
+        });
+    }
+
+    function escapeHtml(str) {
+        if (!str) return "";
+        return String(str)
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
     }
 });

@@ -13,6 +13,10 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 
     long countByQuantityInStockLessThan(int threshold);
 
+    long countBySupplier_SupplierId(Long supplierId);
+
+    List<Product> findBySupplier_SupplierId(Long supplierId);
+
     @Query("SELECT p FROM Product p LEFT JOIN FETCH p.supplier")
     List<Product> findAllWithSupplier();
 }

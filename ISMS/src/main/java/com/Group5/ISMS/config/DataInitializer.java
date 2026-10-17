@@ -34,7 +34,6 @@ public class DataInitializer implements CommandLineRunner {
 
     @Override
     public void run(String... args) {
-        // Seed default admin if user table empty
         if (userRepository.count() == 0) {
             User admin = new User(
                     "admin",
@@ -53,19 +52,17 @@ public class DataInitializer implements CommandLineRunner {
                     "STAFF"
             );
             userRepository.save(staff);
-            System.out.println(">>> Initialized default users: admin/admin123 and staff/staff123");
         }
 
-        // Seed suppliers if empty
         if (supplierRepository.count() == 0) {
             Supplier s1 = supplierRepository.save(new Supplier("TechLink Distribution", "contact@techlink.com", "0901234567"));
             Supplier s2 = supplierRepository.save(new Supplier("Global Hardware Co.", "sales@globalhw.com", "0912345678"));
             Supplier s3 = supplierRepository.save(new Supplier("Apex Components", "support@apexcomp.vn", "0987654321"));
 
             Product p1 = productRepository.save(new Product(s1, "Mechanical Gaming Keyboard", 45));
-            Product p2 = productRepository.save(new Product(s1, "Wireless Ergonomic Mouse", 8)); // Low stock (<10)
+            Product p2 = productRepository.save(new Product(s1, "Wireless Ergonomic Mouse", 8));
             Product p3 = productRepository.save(new Product(s2, "UltraWide 34-inch Monitor", 15));
-            Product p4 = productRepository.save(new Product(s3, "USB-C Hub Multiport", 5)); // Low stock (<10)
+            Product p4 = productRepository.save(new Product(s3, "USB-C Hub Multiport", 5));
 
             stockMovementRepository.save(new StockMovement(p1, 50, LocalDateTime.now().minusDays(3)));
             stockMovementRepository.save(new StockMovement(p1, -5, LocalDateTime.now().minusDays(1)));
@@ -75,8 +72,6 @@ public class DataInitializer implements CommandLineRunner {
             stockMovementRepository.save(new StockMovement(p3, -5, LocalDateTime.now().minusDays(2)));
             stockMovementRepository.save(new StockMovement(p4, 10, LocalDateTime.now().minusDays(1)));
             stockMovementRepository.save(new StockMovement(p4, -5, LocalDateTime.now().minusHours(2)));
-
-            System.out.println(">>> Initialized starter suppliers, products, and stock movements");
         }
     }
 }

@@ -38,7 +38,6 @@ public class Product {
         this.quantityInStock = quantityInStock != null ? quantityInStock : 0;
     }
 
-    // Getters and Setters
     public Long getProductId() {
         return productId;
     }

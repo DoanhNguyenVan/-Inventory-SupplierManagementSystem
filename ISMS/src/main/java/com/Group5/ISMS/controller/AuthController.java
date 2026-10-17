@@ -24,13 +24,6 @@ public class AuthController {
         this.userService = userService;
     }
 
-    // =========================================================================
-    // SPRING MVC VIEW CONTROLLERS (MÔ HÌNH MVC)
-    // =========================================================================
-
-    /**
-     * Dashboard / Home Page (Yêu cầu đăng nhập)
-     */
     @GetMapping({"/", "/index", "/dashboard"})
     public String showDashboard(HttpSession session, Model model) {
         UserDto user = (UserDto) session.getAttribute(SESSION_USER_KEY);
@@ -41,9 +34,6 @@ public class AuthController {
         return "index";
     }
 
-    /**
-     * GET /login - Hiển thị giao diện đăng nhập
-     */
     @GetMapping("/login")
     public String showLoginForm(HttpSession session, Model model) {
         if (session.getAttribute(SESSION_USER_KEY) != null) {
@@ -55,9 +45,6 @@ public class AuthController {
         return "login";
     }
 
-    /**
-     * POST /login - Xử lý đăng nhập Form MVC
-     */
     @PostMapping("/login")
     public String processLogin(@ModelAttribute("loginRequest") LoginRequest request,
                                HttpSession session,
@@ -70,14 +57,11 @@ public class AuthController {
             model.addAttribute("error", e.getMessage());
             return "login";
         } catch (Exception e) {
-            model.addAttribute("error", "Đã xảy ra lỗi đăng nhập: " + e.getMessage());
+            model.addAttribute("error", "Login error: " + e.getMessage());
             return "login";
         }
     }
 
-    /**
-     * GET /register - Hiển thị giao diện đăng ký
-     */
     @GetMapping("/register")
     public String showRegisterForm(HttpSession session, Model model) {
         if (session.getAttribute(SESSION_USER_KEY) != null) {
@@ -89,47 +73,38 @@ public class AuthController {
         return "register";
     }
 
-    /**
-     * POST /register - Xử lý đăng ký Form MVC
-     */
     @PostMapping("/register")
     public String processRegister(@ModelAttribute("registerRequest") RegisterRequest request,
                                   @RequestParam(value = "confirmPassword", required = false) String confirmPassword,
                                   RedirectAttributes redirectAttributes,
                                   Model model) {
         if (request.getPassword() != null && confirmPassword != null && !request.getPassword().equals(confirmPassword)) {
-            model.addAttribute("error", "Mật khẩu xác nhận không khớp!");
+            model.addAttribute("error", "Passwords do not match!");
             return "register";
         }
 
         try {
             userService.register(request);
-            redirectAttributes.addFlashAttribute("success", "Đăng ký tài khoản thành công! Vui lòng đăng nhập.");
+            redirectAttributes.addFlashAttribute("success", "Registration successful! Please sign in.");
             return "redirect:/login";
         } catch (IllegalArgumentException e) {
             model.addAttribute("error", e.getMessage());
             return "register";
         } catch (Exception e) {
-            model.addAttribute("error", "Lỗi tạo tài khoản: " + e.getMessage());
+            model.addAttribute("error", "Registration error: " + e.getMessage());
             return "register";
         }
     }
 
-    /**
-     * GET /logout - Đăng xuất
-     */
     @GetMapping("/logout")
     public String logout(HttpSession session, RedirectAttributes redirectAttributes) {
         if (session != null) {
             session.invalidate();
         }
-        redirectAttributes.addFlashAttribute("success", "Đã đăng xuất thành công.");
+        redirectAttributes.addFlashAttribute("success", "You have been logged out successfully.");
         return "redirect:/login";
     }
 
-    /**
-     * Các trang giao diện bổ sung
-     */
     @GetMapping("/products")
     public String showProducts(HttpSession session, Model model) {
         UserDto user = (UserDto) session.getAttribute(SESSION_USER_KEY);
@@ -154,9 +129,16 @@ public class AuthController {
         return "stock";
     }
 
-    // =========================================================================
-    // REST API ENDPOINTS (Hỗ trợ gọi AJAX / Fetch từ client nếu cần)
-    // =========================================================================
+    @GetMapping("/users")
+    public String showUsers(HttpSession session, Model model) {
+        UserDto user = (UserDto) session.getAttribute(SESSION_USER_KEY);
+        if (user == null) return "redirect:/login";
+        if (!"ADMIN".equalsIgnoreCase(user.getRole())) {
+            return "redirect:/dashboard";
+        }
+        model.addAttribute("user", user);
+        return "users";
+    }
 
     @ResponseBody
     @PostMapping("/api/auth/login")

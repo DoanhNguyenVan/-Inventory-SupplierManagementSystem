@@ -6,7 +6,7 @@ public class RegisterRequest {
     private String password;
     private String fullName;
     private String email;
-    private String role; // optional, defaults to USER
+    private String role;
 
     public RegisterRequest() {
     }

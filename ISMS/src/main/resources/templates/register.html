@@ -20,7 +20,6 @@
             <p>Join ISMS to manage your inventory and suppliers</p>
         </div>
 
-        <!-- Alert messages -->
         <div th:if="${error}" class="alert alert-danger" role="alert" th:text="${error}"></div>
         <div th:if="${success}" class="alert alert-success" role="alert" th:text="${success}"></div>
 
@@ -50,17 +49,6 @@
                 </div>
             </div>
 
-            <div class="mb-3">
-                <label for="role" class="form-label fw-semibold">System Role</label>
-                <div class="input-group">
-                    <span class="input-group-text bg-white"><i class="bi bi-shield-lock text-muted"></i></span>
-                    <select class="form-select" id="role" th:field="*{role}">
-                        <option value="STAFF">Staff (Warehouse / Inventory)</option>
-                        <option value="USER">Standard User</option>
-                        <option value="ADMIN">Administrator</option>
-                    </select>
-                </div>
-            </div>
 
             <div class="row g-2 mb-3">
                 <div class="col-md-6">

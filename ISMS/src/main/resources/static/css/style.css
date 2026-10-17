@@ -19,7 +19,6 @@ body {
     color: var(--text-dark);
 }
 
-/* Sidebar Styling */
 nav.sidebar {
     background-color: var(--sidebar-bg) !important;
     min-height: 100vh;
@@ -57,7 +56,6 @@ nav.sidebar {
     box-shadow: 0 4px 12px rgba(79, 70, 229, 0.35);
 }
 
-/* Main Content & Cards */
 .card {
     background: #ffffff;
     border: 1px solid var(--border-color);
@@ -94,7 +92,6 @@ nav.sidebar {
     justify-content: center;
 }
 
-/* Table Enhancements */
 .table {
     margin-bottom: 0;
     vertical-align: middle;
@@ -121,7 +118,6 @@ nav.sidebar {
     background-color: #f1f5f9;
 }
 
-/* Badges */
 .badge-stock-in {
     background-color: #dcfce7;
     color: #166534;
@@ -146,7 +142,31 @@ nav.sidebar {
     border-radius: 20px;
 }
 
-/* Buttons */
+.badge-out-of-stock {
+    background-color: #fee2e2;
+    color: #b91c1c;
+    font-weight: 600;
+    padding: 4px 10px;
+    border-radius: 20px;
+    border: 1px solid #fca5a5;
+}
+
+.row-out-of-stock {
+    background-color: #fef2f2 !important;
+}
+
+.row-out-of-stock:hover {
+    background-color: #fee2e2 !important;
+}
+
+.row-low-stock {
+    background-color: #fffbeb !important;
+}
+
+.row-low-stock:hover {
+    background-color: #fef3c7 !important;
+}
+
 .btn-primary {
     background-color: var(--primary);
     border-color: var(--primary);
@@ -163,7 +183,6 @@ nav.sidebar {
     box-shadow: 0 4px 12px rgba(79, 70, 229, 0.25);
 }
 
-/* Auth Pages (Login & Register) */
 .auth-wrapper {
     min-height: 100vh;
     display: flex;
