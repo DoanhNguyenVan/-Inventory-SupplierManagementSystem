@@ -2,11 +2,15 @@ package com.Group5.ISMS.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLRestriction;
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
 @Table(name = "suppliers")
+@SQLDelete(sql = "UPDATE suppliers SET is_deleted = 1 WHERE supplier_id = ?")
+@SQLRestriction("is_deleted = 0")
 public class Supplier {
 
     @Id
@@ -23,7 +27,10 @@ public class Supplier {
     @Column(name = "phone", length = 20)
     private String phone;
 
-    @OneToMany(mappedBy = "supplier", cascade = CascadeType.ALL, orphanRemoval = false)
+    @Column(name = "is_deleted", nullable = false, columnDefinition = "bit default 0")
+    private Boolean isDeleted = false;
+
+    @OneToMany(mappedBy = "supplier")
     @JsonIgnoreProperties("supplier")
     private List<Product> products = new ArrayList<>();
 
@@ -34,6 +41,14 @@ public class Supplier {
         this.supplierName = supplierName;
         this.email = email;
         this.phone = phone;
+        this.isDeleted = false;
+    }
+
+    @PrePersist
+    protected void onCreate() {
+        if (this.isDeleted == null) {
+            this.isDeleted = false;
+        }
     }
 
     public Long getSupplierId() {
@@ -74,5 +89,13 @@ public class Supplier {
 
     public void setProducts(List<Product> products) {
         this.products = products;
+    }
+
+    public Boolean getIsDeleted() {
+        return isDeleted;
+    }
+
+    public void setIsDeleted(Boolean isDeleted) {
+        this.isDeleted = isDeleted;
     }
 }

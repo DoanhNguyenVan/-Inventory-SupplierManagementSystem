@@ -7,19 +7,9 @@
     <list default="true" id="be55eb0f-7b06-44d8-a548-894b33accc34" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ISMS/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/ISMS/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ISMS/src/main/java/com/Group5/ISMS/controller/AuthController.java" beforeDir="false" afterPath="$PROJECT_DIR$/ISMS/src/main/java/com/Group5/ISMS/controller/AuthController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ISMS/src/main/java/com/Group5/ISMS/dto/DashboardStatsDto.java" beforeDir="false" afterPath="$PROJECT_DIR$/ISMS/src/main/java/com/Group5/ISMS/dto/DashboardStatsDto.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ISMS/src/main/java/com/Group5/ISMS/repository/UserRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/ISMS/src/main/java/com/Group5/ISMS/repository/UserRepository.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ISMS/src/main/java/com/Group5/ISMS/service/UserService.java" beforeDir="false" afterPath="$PROJECT_DIR$/ISMS/src/main/java/com/Group5/ISMS/service/UserService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ISMS/src/main/java/com/Group5/ISMS/repository/StockMovementRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/ISMS/src/main/java/com/Group5/ISMS/repository/StockMovementRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ISMS/src/main/java/com/Group5/ISMS/service/StockMovementService.java" beforeDir="false" afterPath="$PROJECT_DIR$/ISMS/src/main/java/com/Group5/ISMS/service/StockMovementService.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ISMS/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/ISMS/src/main/resources/application.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ISMS/src/main/resources/static/js/products.js" beforeDir="false" afterPath="$PROJECT_DIR$/ISMS/src/main/resources/static/js/products.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ISMS/src/main/resources/static/js/stock.js" beforeDir="false" afterPath="$PROJECT_DIR$/ISMS/src/main/resources/static/js/stock.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ISMS/src/main/resources/static/js/suppliers.js" beforeDir="false" afterPath="$PROJECT_DIR$/ISMS/src/main/resources/static/js/suppliers.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ISMS/src/main/resources/templates/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/ISMS/src/main/resources/templates/index.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ISMS/src/main/resources/templates/products.html" beforeDir="false" afterPath="$PROJECT_DIR$/ISMS/src/main/resources/templates/products.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ISMS/src/main/resources/templates/register.html" beforeDir="false" afterPath="$PROJECT_DIR$/ISMS/src/main/resources/templates/register.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ISMS/src/main/resources/templates/stock.html" beforeDir="false" afterPath="$PROJECT_DIR$/ISMS/src/main/resources/templates/stock.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ISMS/src/main/resources/templates/suppliers.html" beforeDir="false" afterPath="$PROJECT_DIR$/ISMS/src/main/resources/templates/suppliers.html" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -29,6 +19,7 @@
   <component name="CopilotPersistence">
     <persistenceIdMap>
       <entry key="_C:/Users/ADMIN/Downloads/Inventory-SupplierManagementSystem" value="3KoIgZWdvXH3Em0PNxtSBMhrqBa" />
+      <entry key="_C:/Users/dangi/.gemini/antigravity-ide/scratch/-Inventory-SupplierManagementSystem" value="3Kr5vHXlXI3dWgFSRh34E1Aj2Ok" />
     </persistenceIdMap>
   </component>
   <component name="EmbeddingIndexingInfo">
@@ -67,6 +58,10 @@
     "JavaScript Debug.index.html.executor": "Run",
     "JavaScript Debug.products.html.executor": "Run",
     "Node.js.suppliers.js.executor": "Run",
+    "RequestMappingsPanelOrder0": "0",
+    "RequestMappingsPanelOrder1": "1",
+    "RequestMappingsPanelWidth0": "75",
+    "RequestMappingsPanelWidth1": "75",
     "RunOnceActivity.MCP Project settings loaded": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
@@ -74,18 +69,31 @@
     "RunOnceActivity.typescript.service.memoryLimit.init": "true",
     "Spring Boot.IsmsApplication.executor": "Run",
     "codeWithMe.voiceChat.enabledByDefault": "false",
+    "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1": "true",
     "copilot.chat.legacySessionMetadata.migrated": "true",
-    "git-widget-placeholder": "luhan",
+    "git-widget-placeholder": "main",
+    "ignore.virus.scanning.warn.message": "true",
+    "junie.onboarding.icon.badge.shown": "true",
     "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "C:/Users/ADMIN/Downloads/Inventory-SupplierManagementSystem",
+    "last_opened_file_path": "C:/Users/dangi/.gemini/antigravity-ide/scratch/-Inventory-SupplierManagementSystem",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
     "node.js.selected.package.tslint": "(autodetect)",
     "nodejs_package_manager_path": "npm",
+    "to.speed.mode.migration.done": "true",
     "vue.rearranger.settings.migration": "true"
   }
 }]]></component>
+  <component name="RunManager">
+    <configuration name="IsmsApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
+      <module name="ISMS" />
+      <option name="SPRING_BOOT_MAIN_CLASS" value="com.Group5.ISMS.IsmsApplication" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+  </component>
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
@@ -102,6 +110,7 @@
       <option name="presentableId" value="Default" />
       <updated>1792217605687</updated>
       <workItem from="1792217606941" duration="1671000" />
+      <workItem from="1792303077517" duration="3229000" />
     </task>
     <servers />
   </component>

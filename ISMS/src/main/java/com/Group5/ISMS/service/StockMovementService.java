@@ -56,6 +56,9 @@ public class StockMovementService {
         if (dto.getQuantityChange() == null || dto.getQuantityChange() == 0) {
             throw new IllegalArgumentException("Quantity change cannot be zero!");
         }
+        if (Math.abs(dto.getQuantityChange()) > 1000000) {
+            throw new IllegalArgumentException("Quantity change cannot exceed 1,000,000 units in a single transaction.");
+        }
 
         Product product = productRepository.findById(dto.getProductId())
                 .orElseThrow(() -> new IllegalArgumentException("Product not found with ID: " + dto.getProductId()));
@@ -92,11 +95,17 @@ public class StockMovementService {
 
         Product product = movement.getProduct();
         if (product != null) {
-            int revertedStock = (product.getQuantityInStock() != null ? product.getQuantityInStock() : 0) - movement.getQuantityChange();
-            if (revertedStock >= 0) {
-                product.setQuantityInStock(revertedStock);
-                productRepository.save(product);
+            int currentStock = product.getQuantityInStock() != null ? product.getQuantityInStock() : 0;
+            int revertedStock = currentStock - movement.getQuantityChange();
+            if (revertedStock < 0) {
+                throw new IllegalArgumentException(
+                        "Cannot delete this stock movement because it would cause warehouse stock of '"
+                                + product.getProductName() + "' to become negative (" + revertedStock + " units). Current stock: "
+                                + currentStock + ", movement change: " + movement.getQuantityChange()
+                );
             }
+            product.setQuantityInStock(revertedStock);
+            productRepository.save(product);
         }
 
         stockMovementRepository.delete(movement);

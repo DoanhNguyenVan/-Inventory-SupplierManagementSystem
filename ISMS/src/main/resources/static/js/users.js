@@ -64,13 +64,21 @@ document.addEventListener("DOMContentLoaded", function () {
                     <td>${roleBadge}</td>
                     <td class="text-muted small">${dateStr}</td>
                     <td class="text-end">
-                        <button class="btn btn-outline-primary btn-sm btn-edit-role" 
+                        <button class="btn btn-outline-primary btn-sm btn-edit-role me-1" 
                                 data-id="${u.userId}" 
                                 data-username="${escapeHtml(u.username)}" 
                                 data-role="${u.role}"
                                 title="Change Role">
                             <i class="bi bi-shield-check"></i> Assign Role
                         </button>
+                        ${!isCurrent ? `
+                        <button class="btn btn-outline-danger btn-sm btn-delete-user" 
+                                data-id="${u.userId}" 
+                                data-username="${escapeHtml(u.username)}"
+                                title="Delete User">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                        ` : ''}
                     </td>
                 </tr>
             `;
@@ -104,7 +112,27 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     if (tableBody) {
-        tableBody.addEventListener("click", function (event) {
+        tableBody.addEventListener("click", async function (event) {
+            const deleteBtn = event.target.closest(".btn-delete-user");
+            if (deleteBtn) {
+                const id = deleteBtn.getAttribute("data-id");
+                const username = deleteBtn.getAttribute("data-username");
+                if (confirm(`Are you sure you want to delete user "${username}" (#${id})?`)) {
+                    try {
+                        const res = await fetch(`/api/users/${id}`, { method: "DELETE" });
+                        const result = await res.json();
+                        if (res.ok && result.success) {
+                            loadUsers();
+                        } else {
+                            alert(result.message || "Failed to delete user");
+                        }
+                    } catch (err) {
+                        alert("Error connecting to server while deleting user.");
+                    }
+                }
+                return;
+            }
+
             const editBtn = event.target.closest(".btn-edit-role");
             if (editBtn) {
                 const id = editBtn.getAttribute("data-id");

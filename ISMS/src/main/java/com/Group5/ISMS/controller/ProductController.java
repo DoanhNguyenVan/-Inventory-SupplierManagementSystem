@@ -21,6 +21,10 @@ public class ProductController {
         this.productService = productService;
     }
 
+    private boolean isAuthenticated(HttpSession session) {
+        return session != null && session.getAttribute(AuthController.SESSION_USER_KEY) != null;
+    }
+
     private boolean canModify(HttpSession session) {
         if (session == null) return false;
         UserDto user = (UserDto) session.getAttribute(AuthController.SESSION_USER_KEY);
@@ -31,13 +35,22 @@ public class ProductController {
 
     @GetMapping
     public ResponseEntity<ApiResponse<List<ProductDto>>> getAllProducts(
-            @RequestParam(value = "search", required = false) String search) {
+            @RequestParam(value = "search", required = false) String search,
+            HttpSession session) {
+        if (!isAuthenticated(session)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(ApiResponse.error("Authentication required. Please sign in."));
+        }
         List<ProductDto> products = productService.getAllProducts(search);
         return ResponseEntity.ok(ApiResponse.ok("Products retrieved successfully", products));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ApiResponse<ProductDto>> getProductById(@PathVariable Long id) {
+    public ResponseEntity<ApiResponse<ProductDto>> getProductById(@PathVariable Long id, HttpSession session) {
+        if (!isAuthenticated(session)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(ApiResponse.error("Authentication required. Please sign in."));
+        }
         return productService.getProductById(id)
                 .map(p -> ResponseEntity.ok(ApiResponse.ok("Product found", p)))
                 .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND)

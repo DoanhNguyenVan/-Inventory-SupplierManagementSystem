@@ -176,7 +176,8 @@
     </div>
 
     <script th:inline="javascript">
-        window.CURRENT_USER_ID = [[${user != null ? user.userId : null}]];
+        window.CURRENT_USER_ID   = [[${user != null ? user.userId : null}]];
+        window.CURRENT_USER_ROLE = [[${user != null ? user.role : 'USER'}]];
     </script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
     <script th:src="@{/js/users.js}" src="/js/users.js"></script>

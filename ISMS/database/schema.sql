@@ -1,6 +1,7 @@
 -- ==========================================================
 -- Inventory & Supplier Management System (ISMS)
 -- Database: Microsoft SQL Server (ISMS_DB)
+-- Soft Delete Feature Enabled (is_deleted column added)
 -- ==========================================================
 
 USE ISMS_DB;
@@ -16,8 +17,16 @@ BEGIN
         full_name NVARCHAR(100),
         email NVARCHAR(100) UNIQUE,
         role NVARCHAR(20) DEFAULT 'USER',
+        is_deleted BIT DEFAULT 0 NOT NULL,
         created_at DATETIME DEFAULT GETDATE()
     );
+END
+ELSE
+BEGIN
+    IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID('users') AND name = 'is_deleted')
+    BEGIN
+        ALTER TABLE users ADD is_deleted BIT DEFAULT 0 NOT NULL;
+    END
 END
 GO
 
@@ -28,8 +37,16 @@ BEGIN
         supplier_id BIGINT IDENTITY(1,1) PRIMARY KEY,
         supplier_name NVARCHAR(100) NOT NULL,
         email NVARCHAR(100),
-        phone NVARCHAR(20)
+        phone NVARCHAR(20),
+        is_deleted BIT DEFAULT 0 NOT NULL
     );
+END
+ELSE
+BEGIN
+    IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID('suppliers') AND name = 'is_deleted')
+    BEGIN
+        ALTER TABLE suppliers ADD is_deleted BIT DEFAULT 0 NOT NULL;
+    END
 END
 GO
 
@@ -41,9 +58,17 @@ BEGIN
         supplier_id BIGINT,
         product_name NVARCHAR(150) NOT NULL,
         quantity_in_stock INT DEFAULT 0,
+        is_deleted BIT DEFAULT 0 NOT NULL,
         CONSTRAINT fk_products_supplier FOREIGN KEY (supplier_id) 
             REFERENCES suppliers(supplier_id) ON DELETE SET NULL
     );
+END
+ELSE
+BEGIN
+    IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID('products') AND name = 'is_deleted')
+    BEGIN
+        ALTER TABLE products ADD is_deleted BIT DEFAULT 0 NOT NULL;
+    END
 END
 GO
 
@@ -55,8 +80,16 @@ BEGIN
         product_id BIGINT NOT NULL,
         quantity_change INT NOT NULL,
         movement_date DATETIME DEFAULT GETDATE(),
+        is_deleted BIT DEFAULT 0 NOT NULL,
         CONSTRAINT fk_movements_product FOREIGN KEY (product_id) 
             REFERENCES products(product_id) ON DELETE CASCADE
     );
+END
+ELSE
+BEGIN
+    IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID('stock_movements') AND name = 'is_deleted')
+    BEGIN
+        ALTER TABLE stock_movements ADD is_deleted BIT DEFAULT 0 NOT NULL;
+    END
 END
 GO

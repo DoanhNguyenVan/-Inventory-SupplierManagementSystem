@@ -59,19 +59,35 @@ public class DataInitializer implements CommandLineRunner {
             Supplier s2 = supplierRepository.save(new Supplier("Global Hardware Co.", "sales@globalhw.com", "0912345678"));
             Supplier s3 = supplierRepository.save(new Supplier("Apex Components", "support@apexcomp.vn", "0987654321"));
 
-            Product p1 = productRepository.save(new Product(s1, "Mechanical Gaming Keyboard", 45));
-            Product p2 = productRepository.save(new Product(s1, "Wireless Ergonomic Mouse", 8));
-            Product p3 = productRepository.save(new Product(s2, "UltraWide 34-inch Monitor", 15));
-            Product p4 = productRepository.save(new Product(s3, "USB-C Hub Multiport", 5));
+            // Products always start with quantityInStock=0; stock is tracked via StockMovements only.
+            Product p1 = productRepository.save(new Product(s1, "Mechanical Gaming Keyboard", 0));
+            Product p2 = productRepository.save(new Product(s1, "Wireless Ergonomic Mouse", 0));
+            Product p3 = productRepository.save(new Product(s2, "UltraWide 34-inch Monitor", 0));
+            Product p4 = productRepository.save(new Product(s3, "USB-C Hub Multiport", 0));
 
+            // p1: +50 -5 = 45 in stock
             stockMovementRepository.save(new StockMovement(p1, 50, LocalDateTime.now().minusDays(3)));
             stockMovementRepository.save(new StockMovement(p1, -5, LocalDateTime.now().minusDays(1)));
+            p1.setQuantityInStock(45);
+            productRepository.save(p1);
+
+            // p2: +10 -2 = 8 in stock
             stockMovementRepository.save(new StockMovement(p2, 10, LocalDateTime.now().minusDays(2)));
             stockMovementRepository.save(new StockMovement(p2, -2, LocalDateTime.now().minusHours(5)));
+            p2.setQuantityInStock(8);
+            productRepository.save(p2);
+
+            // p3: +20 -5 = 15 in stock
             stockMovementRepository.save(new StockMovement(p3, 20, LocalDateTime.now().minusDays(4)));
             stockMovementRepository.save(new StockMovement(p3, -5, LocalDateTime.now().minusDays(2)));
+            p3.setQuantityInStock(15);
+            productRepository.save(p3);
+
+            // p4: +10 -5 = 5 in stock
             stockMovementRepository.save(new StockMovement(p4, 10, LocalDateTime.now().minusDays(1)));
             stockMovementRepository.save(new StockMovement(p4, -5, LocalDateTime.now().minusHours(2)));
+            p4.setQuantityInStock(5);
+            productRepository.save(p4);
         }
     }
 }

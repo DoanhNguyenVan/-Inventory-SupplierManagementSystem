@@ -1,0 +1,1347 @@
+{
+	"info": {
+		"_postman_id": "isms-api-collection-v1",
+		"name": "ISMS - Inventory & Supplier Management System",
+		"description": "Comprehensive Postman test collection for ISMS API with automated test scripts and assertions.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "1. Authentication & Session",
+			"item": [
+				{
+					"name": "Register New Account",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 201 Created\", function () {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"pm.test(\"Registration returns success true\", function () {",
+									"    var res = pm.response.json();",
+									"    pm.expect(res.success).to.eql(true);",
+									"    pm.expect(res.data).to.have.property(\"userId\");",
+									"    pm.expect(res.data.username).to.eql(\"teststaff\");",
+									"    pm.environment.set(\"created_user_id\", res.data.userId);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"username\": \"teststaff\",\n    \"password\": \"staff123\",\n    \"fullName\": \"Test Staff Member\",\n    \"email\": \"teststaff@isms.com\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/auth/register",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"register"
+							]
+						}
+					}
+				},
+				{
+					"name": "Login as Admin",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200 OK\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"pm.test(\"Login success with ADMIN role\", function () {",
+									"    var res = pm.response.json();",
+									"    pm.expect(res.success).to.eql(true);",
+									"    pm.expect(res.data.role).to.eql(\"ADMIN\");",
+									"    pm.environment.set(\"current_user_role\", res.data.role);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"username\": \"admin\",\n    \"password\": \"admin123\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/auth/login",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"login"
+							]
+						}
+					}
+				},
+				{
+					"name": "Get Current Profile (Me)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200 OK\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"pm.test(\"Current user session is active\", function () {",
+									"    var res = pm.response.json();",
+									"    pm.expect(res.success).to.eql(true);",
+									"    pm.expect(res.data.username).to.be.a(\"string\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/auth/me",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"me"
+							]
+						}
+					}
+				},
+				{
+					"name": "Login Fail - Wrong Password",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 401 Unauthorized\", function () {",
+									"    pm.response.to.have.status(401);",
+									"});",
+									"pm.test(\"Returns error message\", function () {",
+									"    var res = pm.response.json();",
+									"    pm.expect(res.success).to.eql(false);",
+									"    pm.expect(res.message).to.include(\"Invalid username or password\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"username\": \"admin\",\n    \"password\": \"wrong_password\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/auth/login",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"login"
+							]
+						}
+					}
+				},
+				{
+					"name": "Logout",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200 OK\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/auth/logout",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"logout"
+							]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "2. Dashboard Statistics",
+			"item": [
+				{
+					"name": "Get Dashboard Stats",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200 OK\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"pm.test(\"Dashboard stats contain valid numbers\", function () {",
+									"    var res = pm.response.json();",
+									"    pm.expect(res.success).to.eql(true);",
+									"    pm.expect(res.data).to.have.property(\"totalProducts\");",
+									"    pm.expect(res.data).to.have.property(\"totalSuppliers\");",
+									"    pm.expect(res.data).to.have.property(\"lowStockCount\");",
+									"    pm.expect(res.data).to.have.property(\"totalMovements\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/dashboard/stats",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"dashboard",
+								"stats"
+							]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "3. Supplier Management",
+			"item": [
+				{
+					"name": "Get All Suppliers",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200 OK\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"pm.test(\"Suppliers list is returned\", function () {",
+									"    var res = pm.response.json();",
+									"    pm.expect(res.success).to.eql(true);",
+									"    pm.expect(res.data).to.be.an(\"array\");",
+									"    if (res.data.length > 0) {",
+									"        pm.environment.set(\"supplier_id\", res.data[0].supplierId);",
+									"    }",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/suppliers",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"suppliers"
+							]
+						}
+					}
+				},
+				{
+					"name": "Search Suppliers by Keyword",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200 OK\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"pm.test(\"Search results filtered\", function () {",
+									"    var res = pm.response.json();",
+									"    pm.expect(res.success).to.eql(true);",
+									"    pm.expect(res.data).to.be.an(\"array\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/suppliers?search=TechLink",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"suppliers"
+							],
+							"query": [
+								{
+									"key": "search",
+									"value": "TechLink"
+								}
+							]
+						}
+					}
+				},
+				{
+					"name": "Get Supplier By ID",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200 OK\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"pm.test(\"Supplier matches requested ID\", function () {",
+									"    var res = pm.response.json();",
+									"    pm.expect(res.success).to.eql(true);",
+									"    pm.expect(res.data.supplierId).to.eql(Number(pm.environment.get(\"supplier_id\")));",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/suppliers/{{supplier_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"suppliers",
+								"{{supplier_id}}"
+							]
+						}
+					}
+				},
+				{
+					"name": "Get Products of Supplier",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200 OK\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"pm.test(\"Returns array of products\", function () {",
+									"    var res = pm.response.json();",
+									"    pm.expect(res.success).to.eql(true);",
+									"    pm.expect(res.data).to.be.an(\"array\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/suppliers/{{supplier_id}}/products",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"suppliers",
+								"{{supplier_id}}",
+								"products"
+							]
+						}
+					}
+				},
+				{
+					"name": "Create New Supplier",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 201 Created\", function () {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"pm.test(\"Supplier created successfully\", function () {",
+									"    var res = pm.response.json();",
+									"    pm.expect(res.success).to.eql(true);",
+									"    pm.expect(res.data).to.have.property(\"supplierId\");",
+									"    pm.environment.set(\"new_supplier_id\", res.data.supplierId);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"supplierName\": \"An Phat Computer Corp\",\n    \"email\": \"contact@anphat.vn\",\n    \"phone\": \"0988776655\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/suppliers",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"suppliers"
+							]
+						}
+					}
+				},
+				{
+					"name": "Update Supplier",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200 OK\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"pm.test(\"Supplier name updated\", function () {",
+									"    var res = pm.response.json();",
+									"    pm.expect(res.success).to.eql(true);",
+									"    pm.expect(res.data.supplierName).to.eql(\"An Phat PC Solutions\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"supplierName\": \"An Phat PC Solutions\",\n    \"email\": \"support@anphat.vn\",\n    \"phone\": \"0988776655\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/suppliers/{{new_supplier_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"suppliers",
+								"{{new_supplier_id}}"
+							]
+						}
+					}
+				},
+				{
+					"name": "Fail Validation - Empty Supplier Name",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 400 Bad Request\", function () {",
+									"    pm.response.to.have.status(400);",
+									"});",
+									"pm.test(\"Error message indicates missing name\", function () {",
+									"    var res = pm.response.json();",
+									"    pm.expect(res.success).to.eql(false);",
+									"    pm.expect(res.message).to.include(\"Supplier name is required\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"supplierName\": \"\",\n    \"email\": \"test@test.com\",\n    \"phone\": \"0123456789\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/suppliers",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"suppliers"
+							]
+						}
+					}
+				},
+				{
+					"name": "Delete Supplier (Without Linked Products)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200 OK\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"pm.test(\"Delete success message\", function () {",
+									"    var res = pm.response.json();",
+									"    pm.expect(res.success).to.eql(true);",
+									"    pm.expect(res.message).to.include(\"deleted successfully\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/suppliers/{{new_supplier_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"suppliers",
+								"{{new_supplier_id}}"
+							]
+						}
+					}
+				},
+				{
+					"name": "Fail Delete - Supplier With Linked Products",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 400 Bad Request\", function () {",
+									"    pm.response.to.have.status(400);",
+									"});",
+									"pm.test(\"Refuses to delete linked supplier\", function () {",
+									"    var res = pm.response.json();",
+									"    pm.expect(res.success).to.eql(false);",
+									"    pm.expect(res.message).to.include(\"linked product\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/suppliers/{{supplier_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"suppliers",
+								"{{supplier_id}}"
+							]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "4. Product Management",
+			"item": [
+				{
+					"name": "Get All Products",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200 OK\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"pm.test(\"Products array is returned\", function () {",
+									"    var res = pm.response.json();",
+									"    pm.expect(res.success).to.eql(true);",
+									"    pm.expect(res.data).to.be.an(\"array\");",
+									"    if (res.data.length > 0) {",
+									"        pm.environment.set(\"product_id\", res.data[0].productId);",
+									"        pm.environment.set(\"product_stock\", res.data[0].quantityInStock);",
+									"    }",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/products",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"products"
+							]
+						}
+					}
+				},
+				{
+					"name": "Search Products by Name",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200 OK\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"pm.test(\"Search returns matching products\", function () {",
+									"    var res = pm.response.json();",
+									"    pm.expect(res.success).to.eql(true);",
+									"    pm.expect(res.data).to.be.an(\"array\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/products?search=Keyboard",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"products"
+							],
+							"query": [
+								{
+									"key": "search",
+									"value": "Keyboard"
+								}
+							]
+						}
+					}
+				},
+				{
+					"name": "Get Product By ID",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200 OK\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"pm.test(\"Product ID matches\", function () {",
+									"    var res = pm.response.json();",
+									"    pm.expect(res.success).to.eql(true);",
+									"    pm.expect(res.data.productId).to.eql(Number(pm.environment.get(\"product_id\")));",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/products/{{product_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"products",
+								"{{product_id}}"
+							]
+						}
+					}
+				},
+				{
+					"name": "Create New Product",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 201 Created\", function () {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"pm.test(\"Product created with initial quantity 0\", function () {",
+									"    var res = pm.response.json();",
+									"    pm.expect(res.success).to.eql(true);",
+									"    pm.expect(res.data).to.have.property(\"productId\");",
+									"    pm.expect(res.data.quantityInStock).to.eql(0);",
+									"    pm.environment.set(\"new_product_id\", res.data.productId);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"productName\": \"Keychron K2 Mechanical Keyboard\",\n    \"supplierId\": {{supplier_id}}\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/products",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"products"
+							]
+						}
+					}
+				},
+				{
+					"name": "Update Product Info",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200 OK\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"pm.test(\"Product name updated successfully\", function () {",
+									"    var res = pm.response.json();",
+									"    pm.expect(res.success).to.eql(true);",
+									"    pm.expect(res.data.productName).to.eql(\"Keychron K2 V2 Wireless Keyboard\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"productName\": \"Keychron K2 V2 Wireless Keyboard\",\n    \"supplierId\": {{supplier_id}}\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/products/{{new_product_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"products",
+								"{{new_product_id}}"
+							]
+						}
+					}
+				},
+				{
+					"name": "Fail Validation - Missing Supplier",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 400 Bad Request\", function () {",
+									"    pm.response.to.have.status(400);",
+									"});",
+									"pm.test(\"Error specifies supplier is required\", function () {",
+									"    var res = pm.response.json();",
+									"    pm.expect(res.success).to.eql(false);",
+									"    pm.expect(res.message).to.include(\"Supplier is required\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"productName\": \"Headphone Stand RGB\",\n    \"supplierId\": null\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/products",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"products"
+							]
+						}
+					}
+				},
+				{
+					"name": "Delete Product",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200 OK\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"pm.test(\"Product deleted message\", function () {",
+									"    var res = pm.response.json();",
+									"    pm.expect(res.success).to.eql(true);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/products/{{new_product_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"products",
+								"{{new_product_id}}"
+							]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "5. Stock Movements (In & Out)",
+			"item": [
+				{
+					"name": "Get All Stock Movements",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200 OK\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"pm.test(\"Movements list returned\", function () {",
+									"    var res = pm.response.json();",
+									"    pm.expect(res.success).to.eql(true);",
+									"    pm.expect(res.data).to.be.an(\"array\");",
+									"    if (res.data.length > 0) {",
+									"        pm.environment.set(\"movement_id\", res.data[0].movementId);",
+									"    }",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/stock-movements",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"stock-movements"
+							]
+						}
+					}
+				},
+				{
+					"name": "Record Stock IN (Nhap Kho +25)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 201 Created\", function () {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"pm.test(\"Stock IN recorded and returned\", function () {",
+									"    var res = pm.response.json();",
+									"    pm.expect(res.success).to.eql(true);",
+									"    pm.expect(res.data.quantityChange).to.eql(25);",
+									"    pm.environment.set(\"new_movement_id\", res.data.movementId);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"productId\": {{product_id}},\n    \"quantityChange\": 25,\n    \"movementDate\": \"2026-10-18T10:00:00\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/stock-movements",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"stock-movements"
+							]
+						}
+					}
+				},
+				{
+					"name": "Record Stock OUT (Xuat Kho -5)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 201 Created\", function () {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"pm.test(\"Stock OUT recorded\", function () {",
+									"    var res = pm.response.json();",
+									"    pm.expect(res.success).to.eql(true);",
+									"    pm.expect(res.data.quantityChange).to.eql(-5);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"productId\": {{product_id}},\n    \"quantityChange\": -5,\n    \"movementDate\": \"2026-10-18T11:00:00\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/stock-movements",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"stock-movements"
+							]
+						}
+					}
+				},
+				{
+					"name": "Fail Stock OUT - Insufficient Stock Guard",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 400 Bad Request\", function () {",
+									"    pm.response.to.have.status(400);",
+									"});",
+									"pm.test(\"Prevents negative stock balance\", function () {",
+									"    var res = pm.response.json();",
+									"    pm.expect(res.success).to.eql(false);",
+									"    pm.expect(res.message).to.include(\"Insufficient stock in warehouse\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"productId\": {{product_id}},\n    \"quantityChange\": -99999,\n    \"movementDate\": \"2026-10-18T11:30:00\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/stock-movements",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"stock-movements"
+							]
+						}
+					}
+				},
+				{
+					"name": "Fail Stock Movement - Zero Quantity",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 400 Bad Request\", function () {",
+									"    pm.response.to.have.status(400);",
+									"});",
+									"pm.test(\"Quantity cannot be zero\", function () {",
+									"    var res = pm.response.json();",
+									"    pm.expect(res.success).to.eql(false);",
+									"    pm.expect(res.message).to.include(\"Quantity change cannot be zero\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"productId\": {{product_id}},\n    \"quantityChange\": 0,\n    \"movementDate\": \"2026-10-18T12:00:00\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/stock-movements",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"stock-movements"
+							]
+						}
+					}
+				},
+				{
+					"name": "Delete Stock Movement & Revert Stock",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200 OK\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"pm.test(\"Inventory reverted message\", function () {",
+									"    var res = pm.response.json();",
+									"    pm.expect(res.success).to.eql(true);",
+									"    pm.expect(res.message).to.include(\"reverted successfully\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/stock-movements/{{new_movement_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"stock-movements",
+								"{{new_movement_id}}"
+							]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "6. User Management (Admin Only)",
+			"item": [
+				{
+					"name": "Get All Users",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200 OK\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"pm.test(\"User list is returned\", function () {",
+									"    var res = pm.response.json();",
+									"    pm.expect(res.success).to.eql(true);",
+									"    pm.expect(res.data).to.be.an(\"array\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/users",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"users"
+							]
+						}
+					}
+				},
+				{
+					"name": "Search Users by Keyword",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200 OK\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"pm.test(\"Filter returns matching user\", function () {",
+									"    var res = pm.response.json();",
+									"    pm.expect(res.success).to.eql(true);",
+									"    pm.expect(res.data).to.be.an(\"array\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/users?search=staff",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"users"
+							],
+							"query": [
+								{
+									"key": "search",
+									"value": "staff"
+								}
+							]
+						}
+					}
+				},
+				{
+					"name": "Update User Role to STAFF",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200 OK\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"pm.test(\"Role successfully updated\", function () {",
+									"    var res = pm.response.json();",
+									"    pm.expect(res.success).to.eql(true);",
+									"    pm.expect(res.data.role).to.eql(\"STAFF\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"role\": \"STAFF\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/users/{{created_user_id}}/role",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"users",
+								"{{created_user_id}}",
+								"role"
+							]
+						}
+					}
+				},
+				{
+					"name": "Fail Role Update - Invalid Role Name",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 400 Bad Request\", function () {",
+									"    pm.response.to.have.status(400);",
+									"});",
+									"pm.test(\"Validates allowed role names\", function () {",
+									"    var res = pm.response.json();",
+									"    pm.expect(res.success).to.eql(false);",
+									"    pm.expect(res.message).to.include(\"Permitted roles: ADMIN, STAFF, USER\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"role\": \"SUPER_MANAGER\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/users/{{created_user_id}}/role",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"users",
+								"{{created_user_id}}",
+								"role"
+							]
+						}
+					}
+				}
+			]
+		}
+	]
+}

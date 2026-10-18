@@ -22,6 +22,10 @@ public class SupplierController {
         this.supplierService = supplierService;
     }
 
+    private boolean isAuthenticated(HttpSession session) {
+        return session != null && session.getAttribute(AuthController.SESSION_USER_KEY) != null;
+    }
+
     private boolean canModify(HttpSession session) {
         if (session == null) return false;
         UserDto user = (UserDto) session.getAttribute(AuthController.SESSION_USER_KEY);
@@ -32,13 +36,22 @@ public class SupplierController {
 
     @GetMapping
     public ResponseEntity<ApiResponse<List<SupplierDto>>> getAllSuppliers(
-            @RequestParam(value = "search", required = false) String search) {
+            @RequestParam(value = "search", required = false) String search,
+            HttpSession session) {
+        if (!isAuthenticated(session)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(ApiResponse.error("Authentication required. Please sign in."));
+        }
         List<SupplierDto> suppliers = supplierService.getAllSuppliers(search);
         return ResponseEntity.ok(ApiResponse.ok("Suppliers retrieved successfully", suppliers));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ApiResponse<SupplierDto>> getSupplierById(@PathVariable Long id) {
+    public ResponseEntity<ApiResponse<SupplierDto>> getSupplierById(@PathVariable Long id, HttpSession session) {
+        if (!isAuthenticated(session)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(ApiResponse.error("Authentication required. Please sign in."));
+        }
         return supplierService.getSupplierById(id)
                 .map(s -> ResponseEntity.ok(ApiResponse.ok("Supplier found", s)))
                 .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND)
@@ -46,7 +59,11 @@ public class SupplierController {
     }
 
     @GetMapping("/{id}/products")
-    public ResponseEntity<ApiResponse<List<ProductDto>>> getProductsBySupplier(@PathVariable Long id) {
+    public ResponseEntity<ApiResponse<List<ProductDto>>> getProductsBySupplier(@PathVariable Long id, HttpSession session) {
+        if (!isAuthenticated(session)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(ApiResponse.error("Authentication required. Please sign in."));
+        }
         List<ProductDto> products = supplierService.getProductsBySupplierId(id);
         return ResponseEntity.ok(ApiResponse.ok("Products for supplier retrieved", products));
     }

@@ -32,13 +32,32 @@ public class UserService {
         }
 
         String username = request.getUsername().trim();
+        if (username.length() > 50) {
+            throw new IllegalArgumentException("Username cannot exceed 50 characters");
+        }
+        if (!username.matches("^[a-zA-Z0-9._-]+$")) {
+            throw new IllegalArgumentException("Username can only contain alphanumeric characters, dots, underscores, and hyphens");
+        }
         if (userRepository.existsByUsername(username)) {
             throw new IllegalArgumentException("Username '" + username + "' is already taken");
         }
 
+        String fullName = request.getFullName() != null ? request.getFullName().trim() : null;
+        if (fullName != null && fullName.length() > 100) {
+            throw new IllegalArgumentException("Full name cannot exceed 100 characters");
+        }
+
         String email = request.getEmail() != null ? request.getEmail().trim() : null;
-        if (email != null && !email.isEmpty() && userRepository.existsByEmail(email)) {
-            throw new IllegalArgumentException("Email '" + email + "' is already registered");
+        if (email != null && !email.isEmpty()) {
+            if (email.length() > 100) {
+                throw new IllegalArgumentException("Email cannot exceed 100 characters");
+            }
+            if (!email.matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$")) {
+                throw new IllegalArgumentException("Invalid email format");
+            }
+            if (userRepository.existsByEmail(email)) {
+                throw new IllegalArgumentException("Email '" + email + "' is already registered");
+            }
         }
 
         String hashedPassword = PasswordUtil.hashPassword(request.getPassword());

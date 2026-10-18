@@ -9,6 +9,9 @@ public class StockMovementDto {
     private Long productId;
     private String productName;
     private Integer quantityChange;
+
+    @com.fasterxml.jackson.annotation.JsonFormat(shape = com.fasterxml.jackson.annotation.JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd['T'][ ]HH:mm[:ss]")
+    @org.springframework.format.annotation.DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private LocalDateTime movementDate;
     private Long userId;
     private String performedBy;

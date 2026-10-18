@@ -2,11 +2,15 @@ package com.Group5.ISMS.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLRestriction;
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
 @Table(name = "products")
+@SQLDelete(sql = "UPDATE products SET is_deleted = 1 WHERE product_id = ?")
+@SQLRestriction("is_deleted = 0")
 public class Product {
 
     @Id
@@ -25,7 +29,10 @@ public class Product {
     @Column(name = "quantity_in_stock")
     private Integer quantityInStock = 0;
 
-    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Column(name = "is_deleted", nullable = false, columnDefinition = "bit default 0")
+    private Boolean isDeleted = false;
+
+    @OneToMany(mappedBy = "product")
     @JsonIgnoreProperties("product")
     private List<StockMovement> stockMovements = new ArrayList<>();
 
@@ -36,6 +43,17 @@ public class Product {
         this.supplier = supplier;
         this.productName = productName;
         this.quantityInStock = quantityInStock != null ? quantityInStock : 0;
+        this.isDeleted = false;
+    }
+
+    @PrePersist
+    protected void onCreate() {
+        if (this.isDeleted == null) {
+            this.isDeleted = false;
+        }
+        if (this.quantityInStock == null) {
+            this.quantityInStock = 0;
+        }
     }
 
     public Long getProductId() {
@@ -76,5 +94,13 @@ public class Product {
 
     public void setStockMovements(List<StockMovement> stockMovements) {
         this.stockMovements = stockMovements;
+    }
+
+    public Boolean getIsDeleted() {
+        return isDeleted;
+    }
+
+    public void setIsDeleted(Boolean isDeleted) {
+        this.isDeleted = isDeleted;
     }
 }

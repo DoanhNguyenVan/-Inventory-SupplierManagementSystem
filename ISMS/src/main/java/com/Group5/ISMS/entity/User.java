@@ -1,10 +1,14 @@
 package com.Group5.ISMS.entity;
 
 import jakarta.persistence.*;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLRestriction;
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "users")
+@SQLDelete(sql = "UPDATE users SET is_deleted = 1 WHERE user_id = ?")
+@SQLRestriction("is_deleted = 0")
 public class User {
 
     @Id
@@ -27,6 +31,9 @@ public class User {
     @Column(name = "role", length = 20)
     private String role;
 
+    @Column(name = "is_deleted", nullable = false, columnDefinition = "bit default 0")
+    private Boolean isDeleted = false;
+
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
@@ -39,6 +46,7 @@ public class User {
         this.fullName = fullName;
         this.email = email;
         this.role = role != null ? role : "USER";
+        this.isDeleted = false;
         this.createdAt = LocalDateTime.now();
     }
 
@@ -49,6 +57,9 @@ public class User {
         }
         if (this.role == null) {
             this.role = "USER";
+        }
+        if (this.isDeleted == null) {
+            this.isDeleted = false;
         }
     }
 
@@ -106,5 +117,13 @@ public class User {
 
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
+    }
+
+    public Boolean getIsDeleted() {
+        return isDeleted;
+    }
+
+    public void setIsDeleted(Boolean isDeleted) {
+        this.isDeleted = isDeleted;
     }
 }

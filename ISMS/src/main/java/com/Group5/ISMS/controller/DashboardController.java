@@ -27,7 +27,11 @@ public class DashboardController {
     }
 
     @GetMapping("/stats")
-    public ResponseEntity<ApiResponse<DashboardStatsDto>> getStats() {
+    public ResponseEntity<ApiResponse<DashboardStatsDto>> getStats(jakarta.servlet.http.HttpSession session) {
+        if (session == null || session.getAttribute(AuthController.SESSION_USER_KEY) == null) {
+            return ResponseEntity.status(org.springframework.http.HttpStatus.UNAUTHORIZED)
+                    .body(ApiResponse.error("Authentication required. Please sign in."));
+        }
         long totalProducts = productService.countProducts();
         long totalSuppliers = supplierService.countSuppliers();
         long lowStockCount = productService.countLowStock(10);

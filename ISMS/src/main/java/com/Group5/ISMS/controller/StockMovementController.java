@@ -21,6 +21,10 @@ public class StockMovementController {
         this.stockMovementService = stockMovementService;
     }
 
+    private boolean isAuthenticated(HttpSession session) {
+        return session != null && session.getAttribute(AuthController.SESSION_USER_KEY) != null;
+    }
+
     private boolean canModify(HttpSession session) {
         if (session == null) return false;
         UserDto user = (UserDto) session.getAttribute(AuthController.SESSION_USER_KEY);
@@ -30,13 +34,21 @@ public class StockMovementController {
     }
 
     @GetMapping
-    public ResponseEntity<ApiResponse<List<StockMovementDto>>> getAllStockMovements() {
+    public ResponseEntity<ApiResponse<List<StockMovementDto>>> getAllStockMovements(HttpSession session) {
+        if (!isAuthenticated(session)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(ApiResponse.error("Authentication required. Please sign in."));
+        }
         List<StockMovementDto> list = stockMovementService.getAllStockMovements();
         return ResponseEntity.ok(ApiResponse.ok("Stock movements retrieved successfully", list));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ApiResponse<StockMovementDto>> getStockMovementById(@PathVariable Long id) {
+    public ResponseEntity<ApiResponse<StockMovementDto>> getStockMovementById(@PathVariable Long id, HttpSession session) {
+        if (!isAuthenticated(session)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(ApiResponse.error("Authentication required. Please sign in."));
+        }
         return stockMovementService.getStockMovementById(id)
                 .map(m -> ResponseEntity.ok(ApiResponse.ok("Stock movement found", m)))
                 .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND)

@@ -2,10 +2,14 @@ package com.Group5.ISMS.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLRestriction;
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "stock_movements")
+@SQLDelete(sql = "UPDATE stock_movements SET is_deleted = 1 WHERE movement_id = ?")
+@SQLRestriction("is_deleted = 0")
 public class StockMovement {
 
     @Id
@@ -29,6 +33,9 @@ public class StockMovement {
     @Column(name = "movement_date", nullable = false)
     private LocalDateTime movementDate;
 
+    @Column(name = "is_deleted", nullable = false, columnDefinition = "bit default 0")
+    private Boolean isDeleted = false;
+
     public StockMovement() {
     }
 
@@ -41,12 +48,16 @@ public class StockMovement {
         this.quantityChange = quantityChange;
         this.movementDate = movementDate != null ? movementDate : LocalDateTime.now();
         this.user = user;
+        this.isDeleted = false;
     }
 
     @PrePersist
     protected void onCreate() {
         if (this.movementDate == null) {
             this.movementDate = LocalDateTime.now();
+        }
+        if (this.isDeleted == null) {
+            this.isDeleted = false;
         }
     }
 
@@ -88,5 +99,13 @@ public class StockMovement {
 
     public void setUser(User user) {
         this.user = user;
+    }
+
+    public Boolean getIsDeleted() {
+        return isDeleted;
+    }
+
+    public void setIsDeleted(Boolean isDeleted) {
+        this.isDeleted = isDeleted;
     }
 }

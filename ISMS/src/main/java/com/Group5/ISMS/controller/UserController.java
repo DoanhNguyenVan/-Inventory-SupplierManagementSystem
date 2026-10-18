@@ -86,4 +86,23 @@ public class UserController {
                     .body(ApiResponse.error("Error updating user role: " + e.getMessage()));
         }
     }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<ApiResponse<Void>> deleteUser(@PathVariable Long id, HttpSession session) {
+        UserDto admin = checkAdmin(session);
+        if (admin == null) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(ApiResponse.error("Access denied: Administrator privilege required"));
+        }
+
+        try {
+            userService.deleteUser(id, admin.getUserId());
+            return ResponseEntity.ok(ApiResponse.ok("User deleted successfully"));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(ApiResponse.error(e.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(ApiResponse.error("Error deleting user: " + e.getMessage()));
+        }
+    }
 }
