@@ -12,6 +12,6 @@ public interface StockMovementRepository extends JpaRepository<StockMovement, Lo
     List<StockMovement> findByProduct_ProductId(Long productId);
     long countByProduct_ProductId(Long productId);
 
-    @Query("SELECT sm FROM StockMovement sm JOIN FETCH sm.product LEFT JOIN FETCH sm.user ORDER BY sm.movementDate DESC")
+    @Query("SELECT sm FROM StockMovement sm LEFT JOIN FETCH sm.product LEFT JOIN FETCH sm.user ORDER BY sm.movementDate DESC")
     List<StockMovement> findAllWithProductOrderByMovementDateDesc();
 }

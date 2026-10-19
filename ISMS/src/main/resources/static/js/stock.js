@@ -106,8 +106,17 @@ document.addEventListener("DOMContentLoaded", function () {
             const res = await fetch("/api/products");
             const data = await res.json();
             if (res.ok && data.success) {
-                productSelect.innerHTML = `<option value="">-- Select Product --</option>` +
-                    data.data.map(p => `<option value="${p.productId}">${escapeHtml(p.productName)} (Current stock: ${p.quantityInStock})</option>`).join("");
+                // Only show ACTIVE products - SUSPENDED products cannot have stock movements
+                const activeProducts = data.data.filter(p => {
+                    const status = (p.status || "ACTIVE").toUpperCase();
+                    return status === "ACTIVE";
+                });
+                if (activeProducts.length === 0) {
+                    productSelect.innerHTML = `<option value="">-- No active products available --</option>`;
+                } else {
+                    productSelect.innerHTML = `<option value="">-- Select Product --</option>` +
+                        activeProducts.map(p => `<option value="${p.productId}">${escapeHtml(p.productName)} (Current stock: ${p.quantityInStock})</option>`).join("");
+                }
             }
         } catch (e) {
             console.error("Error loading products dropdown:", e);

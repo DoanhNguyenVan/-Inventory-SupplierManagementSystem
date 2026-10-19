@@ -10,8 +10,8 @@ public class StockMovementDto {
     private String productName;
     private Integer quantityChange;
 
-    @com.fasterxml.jackson.annotation.JsonFormat(shape = com.fasterxml.jackson.annotation.JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd['T'][ ]HH:mm[:ss]")
-    @org.springframework.format.annotation.DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
+    @com.fasterxml.jackson.annotation.JsonFormat(shape = com.fasterxml.jackson.annotation.JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
+    @org.springframework.format.annotation.DateTimeFormat(iso = org.springframework.format.annotation.DateTimeFormat.ISO.DATE_TIME)
     private LocalDateTime movementDate;
     private Long userId;
     private String performedBy;
@@ -25,6 +25,8 @@ public class StockMovementDto {
             if (sm.getProduct() != null) {
                 this.productId = sm.getProduct().getProductId();
                 this.productName = sm.getProduct().getProductName();
+            } else {
+                this.productName = "[Deleted Product]";
             }
             this.quantityChange = sm.getQuantityChange();
             this.movementDate = sm.getMovementDate();

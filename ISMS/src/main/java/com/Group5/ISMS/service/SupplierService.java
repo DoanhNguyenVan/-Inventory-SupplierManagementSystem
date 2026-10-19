@@ -38,7 +38,7 @@ public class SupplierService {
     }
 
     public List<ProductDto> getProductsBySupplierId(Long supplierId) {
-        return productRepository.findBySupplier_SupplierId(supplierId)
+        return productRepository.findBySupplier_SupplierIdAndIsDeletedFalse(supplierId)
                 .stream()
                 .map(ProductDto::new)
                 .collect(Collectors.toList());
@@ -104,7 +104,7 @@ public class SupplierService {
         Supplier supplier = supplierRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Supplier not found with ID: " + id));
 
-        long count = productRepository.countBySupplier_SupplierId(id);
+        long count = productRepository.countBySupplier_SupplierIdAndIsDeletedFalse(id);
         if (count > 0) {
             throw new IllegalArgumentException("Cannot delete supplier '" + supplier.getSupplierName()
                     + "' because it has " + count + " linked product(s) in inventory! Please reassign or delete the related products first.");

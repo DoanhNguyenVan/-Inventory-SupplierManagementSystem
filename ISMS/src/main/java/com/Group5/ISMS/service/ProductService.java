@@ -30,15 +30,25 @@ public class ProductService {
     public List<ProductDto> getAllProducts(String search) {
         List<Product> list;
         if (search != null && !search.trim().isEmpty()) {
-            list = productRepository.findByProductNameContainingIgnoreCase(search.trim());
+            list = productRepository.findByProductNameContainingIgnoreCaseAndIsDeletedFalse(search.trim());
         } else {
-            list = productRepository.findAllWithSupplier();
+            list = productRepository.findAllActiveWithSupplier();
+        }
+        return list.stream().map(ProductDto::new).collect(Collectors.toList());
+    }
+
+    public List<ProductDto> getDeletedProducts(String search) {
+        List<Product> list;
+        if (search != null && !search.trim().isEmpty()) {
+            list = productRepository.findByProductNameContainingIgnoreCaseAndIsDeletedTrue(search.trim());
+        } else {
+            list = productRepository.findAllDeletedWithSupplier();
         }
         return list.stream().map(ProductDto::new).collect(Collectors.toList());
     }
 
     public Optional<ProductDto> getProductById(Long id) {
-        return productRepository.findById(id).map(ProductDto::new);
+        return productRepository.findByProductIdAndIsDeletedFalse(id).map(ProductDto::new);
     }
 
     @Transactional
@@ -61,14 +71,15 @@ public class ProductService {
 
         int initialQuantity = 0;
         Product product = new Product(supplier, trimmedName, initialQuantity);
+        product.setIsDeleted(false);
         Product saved = productRepository.save(product);
         return new ProductDto(saved);
     }
 
     @Transactional
     public ProductDto updateProduct(Long id, ProductDto dto) {
-        Product product = productRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Product not found with ID: " + id));
+        Product product = productRepository.findByProductIdAndIsDeletedFalse(id)
+                .orElseThrow(() -> new IllegalArgumentException("Active product not found with ID: " + id));
 
         if (dto.getProductName() == null || dto.getProductName().trim().isEmpty()) {
             throw new IllegalArgumentException("Product name cannot be empty!");
@@ -88,6 +99,32 @@ public class ProductService {
 
         product.setProductName(trimmedName);
         product.setSupplier(supplier);
+        if (dto.getStatus() != null && !dto.getStatus().trim().isEmpty()) {
+            product.setStatus(dto.getStatus().trim().toUpperCase());
+        }
+
+        Product saved = productRepository.save(product);
+        return new ProductDto(saved);
+    }
+
+    @Transactional
+    public ProductDto toggleProductStatus(Long id, String newStatus) {
+        Product product = productRepository.findByProductIdAndIsDeletedFalse(id)
+                .orElseThrow(() -> new IllegalArgumentException("Active product not found with ID: " + id));
+
+        if (newStatus != null && !newStatus.trim().isEmpty()) {
+            String norm = newStatus.trim().toUpperCase();
+            if (!norm.equals("ACTIVE") && !norm.equals("SUSPENDED")) {
+                throw new IllegalArgumentException("Invalid status! Allowed values: ACTIVE, SUSPENDED");
+            }
+            product.setStatus(norm);
+        } else {
+            if ("SUSPENDED".equalsIgnoreCase(product.getStatus())) {
+                product.setStatus("ACTIVE");
+            } else {
+                product.setStatus("SUSPENDED");
+            }
+        }
 
         Product saved = productRepository.save(product);
         return new ProductDto(saved);
@@ -98,20 +135,64 @@ public class ProductService {
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Product not found with ID: " + id));
 
-        int currentStock = product.getQuantityInStock() != null ? product.getQuantityInStock() : 0;
-        if (currentStock > 0) {
-            throw new IllegalArgumentException("Cannot delete product '" + product.getProductName()
-                    + "' because it currently has " + currentStock + " unit(s) in warehouse stock! Please export or zero-out stock before deleting.");
+        if (Boolean.TRUE.equals(product.getIsDeleted())) {
+            throw new IllegalArgumentException("Product is already in the recycle bin!");
+        }
+
+        product.setIsDeleted(true);
+        product.setStatus("DISCONTINUED");
+        productRepository.save(product);
+    }
+
+    @Transactional
+    public ProductDto restoreProduct(Long id, Integer newQuantity) {
+        Product product = productRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Product not found with ID: " + id));
+
+        if (!Boolean.TRUE.equals(product.getIsDeleted())) {
+            throw new IllegalArgumentException("Product is not in the recycle bin!");
+        }
+
+        if (newQuantity != null) {
+            if (newQuantity < 0) {
+                throw new IllegalArgumentException("Quantity in stock cannot be negative!");
+            }
+            product.setQuantityInStock(newQuantity);
+        }
+
+        product.setIsDeleted(false);
+        product.setStatus("ACTIVE");
+        Product saved = productRepository.save(product);
+        return new ProductDto(saved);
+    }
+
+    @Transactional
+    public void permanentDeleteProduct(Long id) {
+        Product product = productRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Product not found with ID: " + id));
+
+        if (!Boolean.TRUE.equals(product.getIsDeleted())) {
+            throw new IllegalArgumentException("Only products in the recycle bin can be permanently deleted!");
+        }
+
+        long movementCount = stockMovementRepository.countByProduct_ProductId(id);
+        if (movementCount > 0) {
+            throw new IllegalArgumentException("Cannot permanently delete product '" + product.getProductName()
+                    + "' because it has " + movementCount + " linked stock movements. Please keep it in the recycle bin or restore it.");
         }
 
         productRepository.delete(product);
     }
 
     public long countProducts() {
-        return productRepository.count();
+        return productRepository.countByIsDeletedFalse();
+    }
+
+    public long countDeletedProducts() {
+        return productRepository.countByIsDeletedTrue();
     }
 
     public long countLowStock(int threshold) {
-        return productRepository.countByQuantityInStockLessThan(threshold);
+        return productRepository.countByQuantityInStockLessThanAndIsDeletedFalse(threshold);
     }
 }

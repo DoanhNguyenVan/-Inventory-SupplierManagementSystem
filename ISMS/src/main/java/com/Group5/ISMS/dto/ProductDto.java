@@ -9,6 +9,8 @@ public class ProductDto {
     private String supplierName;
     private String productName;
     private Integer quantityInStock;
+    private String status;
+    private Boolean isDeleted;
 
     public ProductDto() {
     }
@@ -22,6 +24,8 @@ public class ProductDto {
             }
             this.productName = p.getProductName();
             this.quantityInStock = p.getQuantityInStock();
+            this.status = p.getStatus();
+            this.isDeleted = p.getIsDeleted();
         }
     }
 
@@ -63,5 +67,21 @@ public class ProductDto {
 
     public void setQuantityInStock(Integer quantityInStock) {
         this.quantityInStock = quantityInStock;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public Boolean getIsDeleted() {
+        return isDeleted;
+    }
+
+    public void setIsDeleted(Boolean isDeleted) {
+        this.isDeleted = isDeleted;
     }
 }

@@ -60,8 +60,18 @@ public class StockMovementService {
             throw new IllegalArgumentException("Quantity change cannot exceed 1,000,000 units in a single transaction.");
         }
 
-        Product product = productRepository.findById(dto.getProductId())
-                .orElseThrow(() -> new IllegalArgumentException("Product not found with ID: " + dto.getProductId()));
+        Product product = productRepository.findByProductIdAndIsDeletedFalse(dto.getProductId())
+                .orElseThrow(() -> new IllegalArgumentException("Active product not found with ID: " + dto.getProductId()));
+
+        // Block all stock movements (in & out) for SUSPENDED products
+        String productStatus = product.getStatus() != null ? product.getStatus().toUpperCase() : "ACTIVE";
+        if ("SUSPENDED".equals(productStatus)) {
+            throw new IllegalArgumentException(
+                "Product '" + product.getProductName() + "' is currently SUSPENDED. "
+                + "Stock movements (in/out) are not allowed for suspended products. "
+                + "Please reactivate the product before performing any stock operations."
+            );
+        }
 
         int currentStock = product.getQuantityInStock() != null ? product.getQuantityInStock() : 0;
         int newStock = currentStock + dto.getQuantityChange();

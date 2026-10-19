@@ -61,6 +61,7 @@
                         </p>
                     </div>
                     <button th:if="${user != null and user.role != 'USER'}"
+                            id="addProductBtn"
                             class="btn btn-primary d-flex align-items-center gap-1 shadow-sm"
                             data-bs-toggle="modal"
                             data-bs-target="#addProductModal">
@@ -68,7 +69,26 @@
                     </button>
                 </div>
 
-                <div class="d-flex align-items-center gap-2 mb-3 flex-wrap">
+                <!-- Navigation Tabs: Active Products & Recycle Bin -->
+                <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+                    <ul class="nav nav-pills gap-2" id="productNavTabs" role="tablist">
+                        <li class="nav-item">
+                            <button class="nav-link active fw-semibold shadow-sm px-3 py-2" id="tabActiveProducts" type="button">
+                                <i class="bi bi-box-seam me-1"></i> Product List
+                                <span class="badge bg-light text-primary rounded-pill ms-1" id="activeCountBadge">0</span>
+                            </button>
+                        </li>
+                        <li class="nav-item" th:if="${user != null and user.role != 'USER'}">
+                            <button class="nav-link text-secondary fw-semibold bg-white border shadow-sm px-3 py-2" id="tabTrashProducts" type="button">
+                                <i class="bi bi-trash3 me-1 text-danger"></i> Recycle Bin
+                                <span class="badge bg-danger rounded-pill ms-1" id="trashCountBadge">0</span>
+                            </button>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Stock Alerts (Only on Active tab) -->
+                <div id="activeStockAlerts" class="d-flex align-items-center gap-2 mb-3 flex-wrap">
                     <small class="fw-bold text-muted me-1">Stock Alerts:</small>
                     <span class="badge bg-danger-subtle text-danger border border-danger-subtle px-2 py-1">
                         <i class="bi bi-slash-circle me-1"></i> Stock = 0: Out of Stock (Red Row)
@@ -97,7 +117,7 @@
                                     <th>ID</th>
                                     <th>Product Name</th>
                                     <th>Supplier</th>
-                                    <th>Quantity in Stock</th>
+                                    <th id="thQuantity">Quantity in Stock</th>
                                     <th>Status</th>
                                     <th class="text-end">Actions</th>
                                 </tr>
@@ -210,6 +230,13 @@
                             </select>
                         </div>
                         <div class="mb-3">
+                            <label class="form-label fw-semibold">Business Status</label>
+                            <select class="form-select" id="editProductStatus" name="status">
+                                <option value="ACTIVE">Active (Selling)</option>
+                                <option value="SUSPENDED">Suspended (Issue / Defective)</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
                             <label class="form-label fw-semibold text-muted">Current Stock Quantity</label>
                             <input type="number" class="form-control bg-light" id="editProductQuantity" name="quantity_in_stock" readonly disabled>
                             <div class="form-text small text-muted">Stock quantity is adjusted automatically via Stock In / Stock Out movements.</div>
@@ -224,11 +251,47 @@
         </div>
     </div>
 
+    <!-- Restore Product Modal (With Quantity Adjustment) -->
+    <div class="modal fade" id="restoreProductModal" tabindex="-1" aria-labelledby="restoreProductModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content border-0 shadow">
+                <div class="modal-header bg-success text-white">
+                    <h5 class="modal-title" id="restoreProductModalLabel"><i class="bi bi-arrow-counterclockwise me-1"></i> Restore Product</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <form id="restoreProductForm">
+                        <input type="hidden" id="restoreProductId">
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold text-muted">Product Name</label>
+                            <input type="text" class="form-control bg-light fw-bold" id="restoreProductName" readonly disabled>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold text-muted">Supplier</label>
+                            <input type="text" class="form-control bg-light" id="restoreProductSupplier" readonly disabled>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Stock Quantity on Restore <span class="text-danger">*</span></label>
+                            <input type="number" class="form-control form-control-lg text-primary fw-bold" id="restoreProductQuantity" min="0" required>
+                            <div class="form-text small text-muted">
+                                <i class="bi bi-info-circle me-1"></i> Enter the actual stock quantity when relisting this product for sale.
+                            </div>
+                        </div>
+                        <div class="d-flex justify-content-end gap-2 mt-4">
+                            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                            <button type="submit" class="btn btn-success"><i class="bi bi-check2-circle me-1"></i> Restore Product</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script th:inline="javascript">
         window.CURRENT_USER_ROLE = [[${user != null ? user.role : 'USER'}]];
     </script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
-    <script th:src="@{/js/products.js}" src="/js/products.js"></script>
+    <script th:src="@{/js/products.js(v=${#dates.createNow().getTime()})}" src="/js/products.js"></script>
 </body>
 
 </html>

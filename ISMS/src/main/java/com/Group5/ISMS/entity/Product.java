@@ -2,15 +2,11 @@ package com.Group5.ISMS.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
-import org.hibernate.annotations.SQLDelete;
-import org.hibernate.annotations.SQLRestriction;
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
 @Table(name = "products")
-@SQLDelete(sql = "UPDATE products SET is_deleted = 1 WHERE product_id = ?")
-@SQLRestriction("is_deleted = 0")
 public class Product {
 
     @Id
@@ -29,6 +25,9 @@ public class Product {
     @Column(name = "quantity_in_stock")
     private Integer quantityInStock = 0;
 
+    @Column(name = "status", length = 30)
+    private String status = "ACTIVE"; // "ACTIVE" (Đang kinh doanh), "SUSPENDED" (Tạm ngưng)
+
     @Column(name = "is_deleted", nullable = false, columnDefinition = "bit default 0")
     private Boolean isDeleted = false;
 
@@ -43,6 +42,7 @@ public class Product {
         this.supplier = supplier;
         this.productName = productName;
         this.quantityInStock = quantityInStock != null ? quantityInStock : 0;
+        this.status = "ACTIVE";
         this.isDeleted = false;
     }
 
@@ -53,6 +53,9 @@ public class Product {
         }
         if (this.quantityInStock == null) {
             this.quantityInStock = 0;
+        }
+        if (this.status == null || this.status.trim().isEmpty()) {
+            this.status = "ACTIVE";
         }
     }
 
@@ -94,6 +97,14 @@ public class Product {
 
     public void setStockMovements(List<StockMovement> stockMovements) {
         this.stockMovements = stockMovements;
+    }
+
+    public String getStatus() {
+        return (status != null && !status.trim().isEmpty()) ? status : "ACTIVE";
+    }
+
+    public void setStatus(String status) {
+        this.status = status != null ? status.toUpperCase() : "ACTIVE";
     }
 
     public Boolean getIsDeleted() {

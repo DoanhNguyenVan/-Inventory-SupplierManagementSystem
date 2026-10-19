@@ -6,17 +6,30 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface ProductRepository extends JpaRepository<Product, Long> {
-    List<Product> findByProductNameContainingIgnoreCase(String name);
 
-    long countByQuantityInStockLessThan(int threshold);
+    List<Product> findByProductNameContainingIgnoreCaseAndIsDeletedFalse(String name);
 
-    long countBySupplier_SupplierId(Long supplierId);
+    List<Product> findByProductNameContainingIgnoreCaseAndIsDeletedTrue(String name);
 
-    List<Product> findBySupplier_SupplierId(Long supplierId);
+    long countByQuantityInStockLessThanAndIsDeletedFalse(int threshold);
 
-    @Query("SELECT p FROM Product p LEFT JOIN FETCH p.supplier")
-    List<Product> findAllWithSupplier();
+    long countBySupplier_SupplierIdAndIsDeletedFalse(Long supplierId);
+
+    List<Product> findBySupplier_SupplierIdAndIsDeletedFalse(Long supplierId);
+
+    @Query("SELECT p FROM Product p LEFT JOIN FETCH p.supplier WHERE p.isDeleted = false ORDER BY p.productId ASC")
+    List<Product> findAllActiveWithSupplier();
+
+    @Query("SELECT p FROM Product p LEFT JOIN FETCH p.supplier WHERE p.isDeleted = true ORDER BY p.productId ASC")
+    List<Product> findAllDeletedWithSupplier();
+
+    long countByIsDeletedFalse();
+
+    long countByIsDeletedTrue();
+
+    Optional<Product> findByProductIdAndIsDeletedFalse(Long id);
 }
