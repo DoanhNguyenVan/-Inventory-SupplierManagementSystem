@@ -34,6 +34,11 @@ public class AuthController {
         return "index";
     }
 
+    @GetMapping("/h2-console")
+    public String redirectH2Console() {
+        return "redirect:/h2-console/";
+    }
+
     @GetMapping("/login")
     public String showLoginForm(HttpSession session, Model model) {
         if (session.getAttribute(SESSION_USER_KEY) != null) {
