@@ -28,6 +28,8 @@
 | TC_AUTH_08 | Lấy thông tin phiên đang đăng nhập | Positive | GET /api/auth/me | Cookie session hợp lệ | 200 OK · thông tin user hiện tại |
 | TC_AUTH_09 | Lấy thông tin khi chưa đăng nhập | Security | GET /api/auth/me | Không có cookie | 401 Unauthorized · `"Not authenticated"` |
 | TC_AUTH_10 | Đăng xuất | Positive | POST /api/auth/logout | Session hợp lệ | 200 OK · session bị hủy |
+| TC_AUTH_11 | Chặn đăng ký trùng thông tin tài khoản bị khóa | Security | POST /api/auth/register | Email/Username đã có trong DB nhưng bị khóa | 400 Bad Request · `"Email/Username belongs to a deactivated/locked account..."` (Chống ghi đè tài khoản) |
+| TC_AUTH_12 | Chặn đăng nhập bằng tài khoản bị khóa | Security | POST /api/auth/login | Tài khoản có `is_deleted = 1` | 400 Bad Request · `"This account has been locked or deactivated. Please contact an Administrator."` |
 
 ---
 
@@ -94,8 +96,10 @@
 | TC_USER_03 | Nâng quyền tài khoản lên STAFF | Positive | PUT /api/users/{id}/role | `role: "STAFF"` | 200 OK · role được cập nhật |
 | TC_USER_04 | Gán role không hợp lệ | Negative | PUT /api/users/{id}/role | `role: "MANAGER_VIP"` | 400 Bad Request · `"Invalid role. Permitted roles: ADMIN, STAFF, USER"` |
 | TC_USER_05 | Hạ quyền Admin duy nhất | Data Integrity | PUT /api/users/{id}/role | `role: "USER"` (Admin cuối) | 400 Bad Request · `"Cannot demote the last remaining Administrator in the system"` |
-| TC_USER_06 | Admin xóa tài khoản nhân viên | Positive | DELETE /api/users/{id} | id của Staff | 200 OK · DB: `is_deleted = 1` · tài khoản không thể đăng nhập |
+| TC_USER_06 | Admin khóa / vô hiệu hóa tài khoản (Soft Delete) | Positive | DELETE /api/users/{id} | id của Staff/User | 200 OK · DB: `is_deleted = 1` · tài khoản chuyển sang tab Locked |
 | TC_USER_07 | Admin tự xóa chính mình | Security | DELETE /api/users/{id} | id của chính Admin đang đăng nhập | 400 Bad Request · `"You cannot delete your own logged-in account"` |
+| TC_USER_08 | Admin xem danh sách tài khoản bị khóa | Positive | GET /api/users/locked | Session ADMIN | 200 OK · danh sách user có `is_deleted = 1` |
+| TC_USER_09 | Admin mở khóa tài khoản (Unlock / Restore) | Positive | PUT /api/users/{id}/restore | id tài khoản bị khóa | 200 OK · `is_deleted = 0` · tài khoản khôi phục hoạt động |
 
 ---
 
@@ -115,10 +119,10 @@
 
 | Phân hệ | Số test case | Positive | Negative | Security | Data Integrity |
 |---------|:------------:|:--------:|:--------:|:--------:|:--------------:|
-| Authentication | 10 | 4 | 3 | 2 | 1 |
+| Authentication | 12 | 4 | 3 | 4 | 1 |
 | Supplier | 10 | 4 | 3 | 1 | 2 |
 | Product | 13 | 8 | 2 | 1 | 2 |
 | Stock Movement | 10 | 3 | 3 | 1 | 3 |
-| User Management | 7 | 3 | 1 | 2 | 1 |
+| User Management | 9 | 5 | 1 | 2 | 1 |
 | Security/Exception | 5 | 0 | 2 | 3 | 0 |
-| **TỔNG** | **55** | **22** | **14** | **10** | **9** |
+| **TỔNG** | **59** | **24** | **14** | **12** | **9** |

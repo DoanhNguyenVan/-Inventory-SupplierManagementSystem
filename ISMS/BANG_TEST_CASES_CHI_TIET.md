@@ -29,6 +29,8 @@
 | **TC_AUTH_08** | Lấy thông tin phiên làm việc (`Me`) | Positive | 1. Đã đăng nhập<br>2. Gửi `GET /api/auth/me` | Cookie session hợp lệ | HTTP 200 OK. Trả về đúng thông tin user đang đăng nhập. | **PASS** |
 | **TC_AUTH_09** | Lấy thông tin khi chưa đăng nhập | Security | 1. Xóa cookie session<br>2. Gửi `GET /api/auth/me` | Không có Cookie | HTTP 401 Unauthorized. Báo `"Not authenticated"`. | **PASS** |
 | **TC_AUTH_10** | Đăng xuất tài khoản | Positive | 1. Gửi `POST /api/auth/logout` | Session đang hoạt động | HTTP 200 OK. Session bị hủy (invalidate). | **PASS** |
+| **TC_AUTH_11** | Chặn đăng ký trùng thông tin tài khoản bị khóa | Security | 1. Thử đăng ký mới với email/username của tài khoản đã bị khóa | `username: "locked_acc"`<br>`email: "locked@test.com"` | HTTP 400 Bad Request. Báo `"Username/Email belongs to a deactivated/locked account. Please contact an Administrator."` Tuyệt đối không ghi đè tài khoản. | **PASS** |
+| **TC_AUTH_12** | Chặn đăng nhập bằng tài khoản bị khóa | Security | 1. Nhập username/email và mật khẩu đúng của tài khoản bị khóa | `username: "locked_acc"`<br>`password: "correctpass"` | HTTP 400 Bad Request. Báo `"This account has been locked or deactivated. Please contact an Administrator."` | **PASS** |
 
 ---
 
@@ -95,8 +97,10 @@
 | **TC_USER_03** | Phân quyền nâng tài khoản lên STAFF | Positive | 1. Admin gọi `PUT /api/users/{id}/role` | `role: "STAFF"` | HTTP 200 OK. Tài khoản được cấp quyền nhân viên kho ngay lập tức. | **PASS** |
 | **TC_USER_04** | Gán vai trò không hợp lệ | Negative | 1. Nhập role không tồn tại | `role: "MANAGER_VIP"` | HTTP 400 Bad Request. Báo `"Invalid role. Permitted roles: ADMIN, STAFF, USER"`. | **PASS** |
 | **TC_USER_05** | Chặn hạ quyền Admin duy nhất | Data Integrity | 1. Hạ quyền của Admin duy nhất trong DB | `role: "USER"` | HTTP 400 Bad Request. Báo `"Cannot demote the last remaining Administrator in the system"`. | **PASS** |
-| **TC_USER_06** | Admin xóa tài khoản nhân viên (Xóa mềm) | Positive | 1. Admin bấm xóa nhân viên | `DELETE /api/users/{staff_id}` | HTTP 200 OK. Báo xóa thành công. Trong DB: `is_deleted = 1`. Tài khoản bị vô hiệu hóa đăng nhập. | **PASS** |
+| **TC_USER_06** | Admin khóa / vô hiệu hóa tài khoản nhân viên (Xóa mềm) | Positive | 1. Admin bấm nút Lock Account | `DELETE /api/users/{staff_id}` | HTTP 200 OK. Trong DB: `is_deleted = 1`. Tài khoản bị vô hiệu hóa đăng nhập và chuyển sang tab Locked Accounts. | **PASS** |
 | **TC_USER_07** | Admin tự xóa chính tài khoản mình | Security | 1. Admin gọi xóa ID của chính mình | `DELETE /api/users/{current_admin_id}` | HTTP 400 Bad Request. Báo `"You cannot delete your own logged-in account"`. | **PASS** |
+| **TC_USER_08** | Admin xem danh sách tài khoản bị khóa | Positive | 1. Admin bấm tab "Locked Accounts"<br>2. Gửi `GET /api/users/locked` | Admin session | HTTP 200 OK. Trả về toàn bộ tài khoản bị khóa (`is_deleted = 1`). | **PASS** |
+| **TC_USER_09** | Admin mở khóa tài khoản (Unlock / Restore) | Positive | 1. Admin bấm nút "Unlock Account"<br>2. Gửi `PUT /api/users/{id}/restore` | ID tài khoản bị khóa | HTTP 200 OK. Báo mở khóa thành công, `is_deleted = 0`. Tài khoản hoạt động và đăng nhập bình thường. | **PASS** |
 
 ---
 

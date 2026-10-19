@@ -58,55 +58,33 @@ public class UserService {
         Optional<User> userByUsername = userRepository.findByUsername(username);
         Optional<User> userByEmail = (email != null && !email.isEmpty()) ? userRepository.findByEmail(email) : Optional.empty();
 
-        // 1. Check if an active user already has this username
-        if (userByUsername.isPresent() && !Boolean.TRUE.equals(userByUsername.get().getIsDeleted())) {
+        // 1. Check if username already exists (active or deactivated/locked)
+        if (userByUsername.isPresent()) {
+            if (Boolean.TRUE.equals(userByUsername.get().getIsDeleted())) {
+                throw new IllegalArgumentException("Username '" + username + "' belongs to a deactivated/locked account. Please contact an Administrator.");
+            }
             throw new IllegalArgumentException("Username '" + username + "' is already taken");
         }
 
-        // 2. Check if an active user already has this email
-        if (userByEmail.isPresent() && !Boolean.TRUE.equals(userByEmail.get().getIsDeleted())) {
+        // 2. Check if email already exists (active or deactivated/locked)
+        if (userByEmail.isPresent()) {
+            if (Boolean.TRUE.equals(userByEmail.get().getIsDeleted())) {
+                throw new IllegalArgumentException("Email '" + email + "' belongs to a deactivated/locked account. Please contact an Administrator.");
+            }
             throw new IllegalArgumentException("Email '" + email + "' is already registered");
         }
 
+        // 3. Create fresh new user (never overwrite any existing or locked account)
         String hashedPassword = PasswordUtil.hashPassword(request.getPassword());
-        User userToSave;
+        User user = new User(
+                username,
+                hashedPassword,
+                fullName,
+                email,
+                "USER"
+        );
 
-        // 3. If an account with this email was soft-deleted, reactivate it seamlessly
-        if (userByEmail.isPresent() && Boolean.TRUE.equals(userByEmail.get().getIsDeleted())) {
-            userToSave = userByEmail.get();
-            // If the desired username is held by another deleted account, release it to avoid collision
-            if (userByUsername.isPresent() && !userByUsername.get().getUserId().equals(userToSave.getUserId())) {
-                User otherDeleted = userByUsername.get();
-                otherDeleted.setUsername("deleted_" + otherDeleted.getUserId() + "_" + System.currentTimeMillis());
-                userRepository.save(otherDeleted);
-            }
-            userToSave.setUsername(username);
-            userToSave.setFullName(fullName);
-            userToSave.setPassword(hashedPassword);
-            userToSave.setRole("USER");
-            userToSave.setIsDeleted(false);
-            userToSave.setCreatedAt(LocalDateTime.now());
-        } else if (userByUsername.isPresent() && Boolean.TRUE.equals(userByUsername.get().getIsDeleted())) {
-            // If an account with this username was soft-deleted, reactivate it
-            userToSave = userByUsername.get();
-            userToSave.setEmail(email);
-            userToSave.setFullName(fullName);
-            userToSave.setPassword(hashedPassword);
-            userToSave.setRole("USER");
-            userToSave.setIsDeleted(false);
-            userToSave.setCreatedAt(LocalDateTime.now());
-        } else {
-            // Fresh new registration
-            userToSave = new User(
-                    username,
-                    hashedPassword,
-                    fullName,
-                    email,
-                    "USER"
-            );
-        }
-
-        User saved = userRepository.save(userToSave);
+        User saved = userRepository.save(user);
         return new UserDto(saved);
     }
 
@@ -131,7 +109,7 @@ public class UserService {
                 deletedUser = userRepository.findByEmail(identifier);
             }
             if (deletedUser.isPresent() && Boolean.TRUE.equals(deletedUser.get().getIsDeleted())) {
-                throw new IllegalArgumentException("This account has been deactivated. Please register again to reactivate your account.");
+                throw new IllegalArgumentException("This account has been locked or deactivated. Please contact an Administrator.");
             }
             throw new IllegalArgumentException("Invalid username or password");
         }
@@ -154,7 +132,7 @@ public class UserService {
     }
 
     public List<UserDto> getAllUsers() {
-        return userRepository.findByIsDeletedFalse()
+        return userRepository.findByIsDeletedFalseOrderByUserIdAsc()
                 .stream()
                 .map(UserDto::new)
                 .collect(Collectors.toList());
@@ -210,5 +188,36 @@ public class UserService {
 
         targetUser.setIsDeleted(true);
         userRepository.save(targetUser);
+    }
+
+    public List<UserDto> getLockedUsers() {
+        return userRepository.findByIsDeletedTrueOrderByUserIdAsc()
+                .stream()
+                .map(UserDto::new)
+                .collect(Collectors.toList());
+    }
+
+    public List<UserDto> searchLockedUsers(String keyword) {
+        if (keyword == null || keyword.trim().isEmpty()) {
+            return getLockedUsers();
+        }
+        return userRepository.searchLockedUsers(keyword.trim())
+                .stream()
+                .map(UserDto::new)
+                .collect(Collectors.toList());
+    }
+
+    @Transactional
+    public UserDto restoreUser(Long targetUserId) {
+        User targetUser = userRepository.findByUserIdAndIsDeletedTrue(targetUserId)
+                .orElseThrow(() -> new IllegalArgumentException("Locked user not found with id: " + targetUserId));
+
+        targetUser.setIsDeleted(false);
+        User restored = userRepository.save(targetUser);
+        return new UserDto(restored);
+    }
+
+    public long countLockedUsers() {
+        return userRepository.countByIsDeletedTrue();
     }
 }

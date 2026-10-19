@@ -81,8 +81,26 @@
                 <div class="alert alert-primary d-flex align-items-center" role="alert">
                     <i class="bi bi-info-circle-fill fs-5 me-2"></i>
                     <div>
-                        All self-registered users are assigned the <strong>USER</strong> (Read-Only) role by default. As an Administrator, you can assign accounts to <strong>STAFF</strong> (Warehouse Editor) or promote to <strong>ADMIN</strong>.
+                        All self-registered users are assigned the <strong>USER</strong> (Read-Only) role by default. As an Administrator, you can assign accounts to <strong>STAFF</strong> (Warehouse Editor) or promote to <strong>ADMIN</strong>. Locked accounts cannot log in or be overwritten.
                     </div>
+                </div>
+
+                <!-- Navigation Tabs: Active Users vs Locked Accounts -->
+                <div class="mb-3">
+                    <ul class="nav nav-pills gap-2" id="userManagementTabs" role="tablist">
+                        <li class="nav-item">
+                            <button class="nav-link active fw-semibold shadow-sm px-3 py-2" id="tabActiveUsers" type="button">
+                                <i class="bi bi-person-check-fill me-1 text-success"></i> Active Accounts
+                                <span class="badge bg-success rounded-pill ms-1" id="activeUserCountBadge">0</span>
+                            </button>
+                        </li>
+                        <li class="nav-item">
+                            <button class="nav-link text-secondary fw-semibold bg-white border shadow-sm px-3 py-2" id="tabLockedUsers" type="button">
+                                <i class="bi bi-person-slash me-1 text-danger"></i> Locked Accounts
+                                <span class="badge bg-danger rounded-pill ms-1" id="lockedUserCountBadge">0</span>
+                            </button>
+                        </li>
+                    </ul>
                 </div>
 
                 <div class="card p-3 shadow-sm border-0">

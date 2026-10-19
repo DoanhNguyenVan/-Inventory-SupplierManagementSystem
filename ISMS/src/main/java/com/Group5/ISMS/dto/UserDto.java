@@ -10,6 +10,7 @@ public class UserDto {
     private String fullName;
     private String email;
     private String role;
+    private Boolean isDeleted;
     private LocalDateTime createdAt;
 
     public UserDto() {
@@ -22,6 +23,7 @@ public class UserDto {
             this.fullName = user.getFullName();
             this.email = user.getEmail();
             this.role = user.getRole();
+            this.isDeleted = user.getIsDeleted();
             this.createdAt = user.getCreatedAt();
         }
     }
@@ -64,6 +66,14 @@ public class UserDto {
 
     public void setRole(String role) {
         this.role = role;
+    }
+
+    public Boolean getIsDeleted() {
+        return isDeleted;
+    }
+
+    public void setIsDeleted(Boolean isDeleted) {
+        this.isDeleted = isDeleted;
     }
 
     public LocalDateTime getCreatedAt() {

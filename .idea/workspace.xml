@@ -6,10 +6,15 @@
   <component name="ChangeListManager">
     <list default="true" id="be55eb0f-7b06-44d8-a548-894b33accc34" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ISMS/src/main/java/com/Group5/ISMS/controller/AuthController.java" beforeDir="false" afterPath="$PROJECT_DIR$/ISMS/src/main/java/com/Group5/ISMS/controller/AuthController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ISMS/src/main/java/com/Group5/ISMS/entity/User.java" beforeDir="false" afterPath="$PROJECT_DIR$/ISMS/src/main/java/com/Group5/ISMS/entity/User.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ISMS/BANG_TEST_CASES.md" beforeDir="false" afterPath="$PROJECT_DIR$/ISMS/BANG_TEST_CASES.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ISMS/BANG_TEST_CASES_CHI_TIET.md" beforeDir="false" afterPath="$PROJECT_DIR$/ISMS/BANG_TEST_CASES_CHI_TIET.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ISMS/src/main/java/com/Group5/ISMS/controller/UserController.java" beforeDir="false" afterPath="$PROJECT_DIR$/ISMS/src/main/java/com/Group5/ISMS/controller/UserController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ISMS/src/main/java/com/Group5/ISMS/dto/UserDto.java" beforeDir="false" afterPath="$PROJECT_DIR$/ISMS/src/main/java/com/Group5/ISMS/dto/UserDto.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ISMS/src/main/java/com/Group5/ISMS/repository/UserRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/ISMS/src/main/java/com/Group5/ISMS/repository/UserRepository.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ISMS/src/main/java/com/Group5/ISMS/service/UserService.java" beforeDir="false" afterPath="$PROJECT_DIR$/ISMS/src/main/java/com/Group5/ISMS/service/UserService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ISMS/src/main/resources/static/js/users.js" beforeDir="false" afterPath="$PROJECT_DIR$/ISMS/src/main/resources/static/js/users.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ISMS/src/main/resources/templates/login.html" beforeDir="false" afterPath="$PROJECT_DIR$/ISMS/src/main/resources/templates/login.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ISMS/src/main/resources/templates/users.html" beforeDir="false" afterPath="$PROJECT_DIR$/ISMS/src/main/resources/templates/users.html" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -68,38 +73,38 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "JavaScript Debug.index.html.executor": "Run",
-    "JavaScript Debug.products.html.executor": "Run",
-    "Node.js.suppliers.js.executor": "Run",
-    "RequestMappingsPanelOrder0": "0",
-    "RequestMappingsPanelOrder1": "1",
-    "RequestMappingsPanelWidth0": "75",
-    "RequestMappingsPanelWidth1": "75",
-    "RunOnceActivity.MCP Project settings loaded": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "RunOnceActivity.typescript.service.memoryLimit.init": "true",
-    "Spring Boot.IsmsApplication.executor": "Run",
-    "codeWithMe.voiceChat.enabledByDefault": "false",
-    "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1": "true",
-    "copilot.chat.legacySessionMetadata.migrated": "true",
-    "git-widget-placeholder": "dungdi",
-    "ignore.virus.scanning.warn.message": "true",
-    "junie.onboarding.icon.badge.shown": "true",
-    "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "C:/Users/dangi/.gemini/antigravity-ide/scratch/-Inventory-SupplierManagementSystem",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "to.speed.mode.migration.done": "true",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;JavaScript Debug.index.html.executor&quot;: &quot;Run&quot;,
+    &quot;JavaScript Debug.products.html.executor&quot;: &quot;Run&quot;,
+    &quot;Node.js.suppliers.js.executor&quot;: &quot;Run&quot;,
+    &quot;RequestMappingsPanelOrder0&quot;: &quot;0&quot;,
+    &quot;RequestMappingsPanelOrder1&quot;: &quot;1&quot;,
+    &quot;RequestMappingsPanelWidth0&quot;: &quot;75&quot;,
+    &quot;RequestMappingsPanelWidth1&quot;: &quot;75&quot;,
+    &quot;RunOnceActivity.MCP Project settings loaded&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.typescript.service.memoryLimit.init&quot;: &quot;true&quot;,
+    &quot;Spring Boot.IsmsApplication.executor&quot;: &quot;Run&quot;,
+    &quot;codeWithMe.voiceChat.enabledByDefault&quot;: &quot;false&quot;,
+    &quot;com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1&quot;: &quot;true&quot;,
+    &quot;copilot.chat.legacySessionMetadata.migrated&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;dungdi&quot;,
+    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
+    &quot;junie.onboarding.icon.badge.shown&quot;: &quot;true&quot;,
+    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/dangi/.gemini/antigravity-ide/scratch/-Inventory-SupplierManagementSystem&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;to.speed.mode.migration.done&quot;: &quot;true&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="RunManager">
     <configuration name="IsmsApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
       <module name="ISMS" />
@@ -126,7 +131,8 @@
       <updated>1792217605687</updated>
       <workItem from="1792217606941" duration="1671000" />
       <workItem from="1792303077517" duration="3229000" />
-      <workItem from="1792373726307" duration="5821000" />
+      <workItem from="1792373726307" duration="6903000" />
+      <workItem from="1792385308980" duration="601000" />
     </task>
     <servers />
   </component>

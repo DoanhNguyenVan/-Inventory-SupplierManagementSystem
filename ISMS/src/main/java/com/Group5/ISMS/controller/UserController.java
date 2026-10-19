@@ -105,4 +105,47 @@ public class UserController {
                     .body(ApiResponse.error("Error deleting user: " + e.getMessage()));
         }
     }
+
+    @GetMapping("/locked")
+    public ResponseEntity<ApiResponse<List<UserDto>>> getLockedUsers(
+            @RequestParam(value = "search", required = false) String search,
+            HttpSession session) {
+        UserDto admin = checkAdmin(session);
+        if (admin == null) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(ApiResponse.error("Access denied: Administrator privilege required"));
+        }
+
+        List<UserDto> users = userService.searchLockedUsers(search);
+        return ResponseEntity.ok(ApiResponse.ok("Locked users retrieved successfully", users));
+    }
+
+    @PutMapping("/{id}/restore")
+    public ResponseEntity<ApiResponse<UserDto>> restoreUser(@PathVariable Long id, HttpSession session) {
+        UserDto admin = checkAdmin(session);
+        if (admin == null) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(ApiResponse.error("Access denied: Administrator privilege required"));
+        }
+
+        try {
+            UserDto restored = userService.restoreUser(id);
+            return ResponseEntity.ok(ApiResponse.ok("User \"" + restored.getUsername() + "\" has been unlocked successfully", restored));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(ApiResponse.error(e.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(ApiResponse.error("Error restoring user: " + e.getMessage()));
+        }
+    }
+
+    @GetMapping("/locked/count")
+    public ResponseEntity<ApiResponse<Long>> getLockedCount(HttpSession session) {
+        UserDto admin = checkAdmin(session);
+        if (admin == null) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(ApiResponse.error("Access denied: Administrator privilege required"));
+        }
+        return ResponseEntity.ok(ApiResponse.ok("Locked user count", userService.countLockedUsers()));
+    }
 }

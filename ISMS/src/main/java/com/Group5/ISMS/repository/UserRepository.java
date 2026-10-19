@@ -22,6 +22,8 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     Optional<User> findByUserIdAndIsDeletedFalse(Long userId);
 
+    Optional<User> findByUserIdAndIsDeletedTrue(Long userId);
+
     boolean existsByUsername(String username);
 
     boolean existsByEmail(String email);
@@ -30,13 +32,27 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     boolean existsByEmailAndIsDeletedFalse(String email);
 
-    List<User> findByIsDeletedFalse();
+    List<User> findByIsDeletedFalseOrderByUserIdAsc();
+
+    List<User> findByIsDeletedTrueOrderByUserIdAsc();
+
+    long countByIsDeletedFalse();
+
+    long countByIsDeletedTrue();
 
     @Query("SELECT u FROM User u WHERE u.isDeleted = false AND (" +
            "LOWER(u.username) LIKE LOWER(CONCAT('%', :kw, '%')) OR " +
            "LOWER(u.fullName) LIKE LOWER(CONCAT('%', :kw, '%')) OR " +
-           "LOWER(u.email) LIKE LOWER(CONCAT('%', :kw, '%')))")
+           "LOWER(u.email) LIKE LOWER(CONCAT('%', :kw, '%')))" +
+           " ORDER BY u.userId ASC")
     List<User> searchActiveUsers(@Param("kw") String keyword);
+
+    @Query("SELECT u FROM User u WHERE u.isDeleted = true AND (" +
+           "LOWER(u.username) LIKE LOWER(CONCAT('%', :kw, '%')) OR " +
+           "LOWER(u.fullName) LIKE LOWER(CONCAT('%', :kw, '%')) OR " +
+           "LOWER(u.email) LIKE LOWER(CONCAT('%', :kw, '%')))" +
+           " ORDER BY u.userId ASC")
+    List<User> searchLockedUsers(@Param("kw") String keyword);
 
     long countByRoleAndIsDeletedFalse(String role);
 }
