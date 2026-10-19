@@ -1,4 +1,4 @@
-﻿# GIẢI THÍCH CƠ SỞ DỮ LIỆU
+# GIẢI THÍCH CƠ SỞ DỮ LIỆU
 ## HỆ THỐNG QUẢN LÝ TỒN KHO & NHÀ CUNG CẤP (ISMS)
 
 ---
@@ -85,6 +85,7 @@ CREATE TABLE products (
     supplier_id      BIGINT,
     product_name     NVARCHAR(150) NOT NULL,
     quantity_in_stock INT DEFAULT 0,
+    status           NVARCHAR(20) DEFAULT 'ACTIVE' NOT NULL,
     is_deleted       BIT DEFAULT 0 NOT NULL,
 
     CONSTRAINT fk_products_supplier
@@ -99,11 +100,13 @@ CREATE TABLE products (
 | `supplier_id` | BIGINT | FK → suppliers, Nullable | Nhà cung cấp của sản phẩm |
 | `product_name` | NVARCHAR(150) | NOT NULL | Tên sản phẩm |
 | `quantity_in_stock` | INT | DEFAULT 0 | Số lượng tồn kho hiện tại |
-| `is_deleted` | BIT | DEFAULT 0, NOT NULL | Soft Delete flag |
+| `status` | NVARCHAR(20) | DEFAULT 'ACTIVE', NOT NULL | Trạng thái kinh doanh: `ACTIVE` (đang bán) / `SUSPENDED` (tạm ngưng) |
+| `is_deleted` | BIT | DEFAULT 0, NOT NULL | Soft Delete flag (1 = trong Thùng rác / Discontinued) |
 
 **Ghi chú thiết kế:**
+- `status`: Quản lý vòng đời sản phẩm. Khi `status = 'SUSPENDED'`, sản phẩm tạm ngưng kinh doanh, mọi giao dịch xuất/nhập kho liên quan đều bị chặn ở tầng Service.
 - `supplier_id` Nullable + `ON DELETE SET NULL`: nếu nhà cung cấp bị xóa, sản phẩm vẫn tồn tại, trường `supplier_id` trở thành NULL.
-- `quantity_in_stock` là **trường đồng bộ** (denormalized): giá trị bằng tổng đại số tất cả `quantity_change` trong `stock_movements`. Cập nhật mỗi khi có phiếu kho mới hoặc xóa phiếu kho.
+- `quantity_in_stock` là **trường đồng bộ** (denormalized): giá trị bằng tổng đại số tất cả `quantity_change` trong `stock_movements`. Cập nhật mỗi khi có phiếu kho mới hoặc khi khôi phục sản phẩm từ Thùng rác.
 - Không có ràng buộc `CHECK (quantity_in_stock >= 0)` ở cấp database — kiểm tra ở tầng Service để có thông báo lỗi rõ ràng.
 
 ---
@@ -171,9 +174,9 @@ CREATE TABLE stock_movements (
 │ supplier_id (FK) │    1  N  │ user_id (FK, nullable)       │
 │ product_name     │          │ movement_id                  │
 │ quantity_in_stock│          │ quantity_change               │
-│ is_deleted       │          │ movement_date                │
-└──────────────────┘          │ is_deleted                   │
-                              └──────────────────────────────┘
+│ status           │          │ movement_date                │
+│ is_deleted       │          │ is_deleted                   │
+└──────────────────┘          └──────────────────────────────┘
 ```
 
 ---
@@ -187,6 +190,7 @@ CREATE TABLE stock_movements (
   { productId: 1, quantityChange: 50 }
         ↓
 [Service] Đọc products WHERE product_id = 1
+  → Kiểm tra status: Nếu status == "SUSPENDED" → Báo lỗi 400 (Cannot perform stock movement on suspended product)
   quantity_in_stock hiện tại = 10
         ↓
 [Service] Tính: newStock = 10 + 50 = 60
@@ -205,29 +209,31 @@ CREATE TABLE stock_movements (
   { productId: 1, quantityChange: -100 }
         ↓
 [Service] Đọc products WHERE product_id = 1
+  → Kiểm tra status: Nếu status == "SUSPENDED" → Báo lỗi 400 (Chặn xuất kho sản phẩm tạm ngưng bán)
   quantity_in_stock hiện tại = 60
         ↓
 [Service] Tính: newStock = 60 + (-100) = -40
   → KHÔNG hợp lệ (< 0)
         ↓
 [Response] 400 Bad Request
-  { success: false, message: "Insufficient stock..." }
+  { success: false, message: "Insufficient stock in warehouse..." }
   -- Không có bản ghi nào được ghi vào DB --
 ```
 
-### 4.3. Xóa mềm (bất kỳ bảng nào)
+### 4.3. Chuyển sản phẩm vào Thùng rác (Soft Delete)
 
 ```
 [Client] DELETE /api/products/1
+        ↓
+[Service] Kiểm tra: nếu quantity_in_stock > 0 → cảnh báo/chặn hoặc xác nhận
         ↓
 [Hibernate @SQLDelete]
   Thực thi: UPDATE products SET is_deleted = 1 WHERE product_id = 1
         ↓
 [@SQLRestriction("is_deleted = 0")]
-  Mọi SELECT sau đó tự lọc: ... WHERE is_deleted = 0
-  → product_id = 1 không xuất hiện trong kết quả
-        ↓
-  -- Bản ghi vẫn còn trong DB, chỉ bị ẩn khỏi giao diện --
+  Mọi SELECT thông thường tự lọc: ... WHERE is_deleted = 0
+  → product_id = 1 chuyển sang danh sách Thùng rác (Recycle Bin - /api/products/trash)
+  -- Không có nút xóa vĩnh viễn (Hard delete), bảo vệ toàn vẹn lịch sử phiếu kho --
 ```
 
 ### 4.4. Hủy phiếu kho
@@ -247,6 +253,33 @@ CREATE TABLE stock_movements (
 [DB] UPDATE stock_movements SET is_deleted = 1 WHERE movement_id = 5
         ↓
 [Response] 200 OK · tồn kho đã được hoàn tác
+```
+
+### 4.5. Tạm dừng / Mở lại kinh doanh (Suspend / Reactivate)
+
+```
+[Client] PATCH /api/products/{id}/status
+        ↓
+[Service] Đổi trạng thái:
+  - Nếu hiện tại là ACTIVE → chuyển thành SUSPENDED
+  - Nếu hiện tại là SUSPENDED → chuyển thành ACTIVE
+        ↓
+[DB] UPDATE products SET status = 'SUSPENDED' WHERE product_id = {id}
+        ↓
+[Response] 200 OK · ProductDto (cập nhật badge trạng thái, chặn các giao dịch xuất kho)
+```
+
+### 4.6. Khôi phục sản phẩm từ Thùng rác (Restore with Stock Update)
+
+```
+[Client] PUT /api/products/{id}/restore
+  Body: { quantityInStock: 25 } (tùy chọn điều chỉnh tồn kho)
+        ↓
+[Service] Tìm sản phẩm bằng Native Query / Custom Repo (bỏ qua bộ lọc is_deleted = 0)
+        ↓
+[DB] UPDATE products SET is_deleted = 0, status = 'ACTIVE', quantity_in_stock = 25 WHERE product_id = {id}
+        ↓
+[Response] 200 OK · ProductDto (sản phẩm xuất hiện lại trên Product List)
 ```
 
 ---
@@ -269,17 +302,24 @@ File [`database/schema.sql`](./database/schema.sql) được thiết kế idempo
 
 ```sql
 -- Kiểm tra bảng đã tồn tại chưa trước khi CREATE
-IF NOT EXISTS (SELECT * FROM sys.tables WHERE name = 'users')
+IF NOT EXISTS (SELECT * FROM sys.tables WHERE name = 'products')
 BEGIN
-    CREATE TABLE users (...);
+    CREATE TABLE products (...);
 END
 ELSE
 BEGIN
     -- Kiểm tra cột is_deleted đã có chưa trước khi ALTER
     IF NOT EXISTS (SELECT * FROM sys.columns
-                   WHERE object_id = OBJECT_ID('users') AND name = 'is_deleted')
+                   WHERE object_id = OBJECT_ID('products') AND name = 'is_deleted')
     BEGIN
-        ALTER TABLE users ADD is_deleted BIT DEFAULT 0 NOT NULL;
+        ALTER TABLE products ADD is_deleted BIT DEFAULT 0 NOT NULL;
+    END
+
+    -- Kiểm tra cột status đã có chưa trước khi ALTER
+    IF NOT EXISTS (SELECT * FROM sys.columns
+                   WHERE object_id = OBJECT_ID('products') AND name = 'status')
+    BEGIN
+        ALTER TABLE products ADD status NVARCHAR(20) DEFAULT 'ACTIVE' NOT NULL;
     END
 END
 GO
@@ -287,7 +327,7 @@ GO
 
 Cách tiếp cận này đảm bảo:
 - Chạy lần đầu: tạo bảng đầy đủ.
-- Chạy trên DB cũ chưa có cột `is_deleted`: tự động thêm cột.
+- Chạy trên DB cũ chưa có cột `is_deleted` hoặc `status`: tự động thêm cột tương thích ngược.
 - Chạy trên DB đã đầy đủ: không làm gì, không lỗi.
 
 ---

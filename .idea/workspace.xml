@@ -4,22 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="be55eb0f-7b06-44d8-a548-894b33accc34" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ISMS/src/main/java/com/Group5/ISMS/controller/ProductController.java" beforeDir="false" afterPath="$PROJECT_DIR$/ISMS/src/main/java/com/Group5/ISMS/controller/ProductController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ISMS/src/main/java/com/Group5/ISMS/dto/ProductDto.java" beforeDir="false" afterPath="$PROJECT_DIR$/ISMS/src/main/java/com/Group5/ISMS/dto/ProductDto.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ISMS/src/main/java/com/Group5/ISMS/dto/StockMovementDto.java" beforeDir="false" afterPath="$PROJECT_DIR$/ISMS/src/main/java/com/Group5/ISMS/dto/StockMovementDto.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ISMS/src/main/java/com/Group5/ISMS/entity/Product.java" beforeDir="false" afterPath="$PROJECT_DIR$/ISMS/src/main/java/com/Group5/ISMS/entity/Product.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ISMS/src/main/java/com/Group5/ISMS/entity/StockMovement.java" beforeDir="false" afterPath="$PROJECT_DIR$/ISMS/src/main/java/com/Group5/ISMS/entity/StockMovement.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ISMS/src/main/java/com/Group5/ISMS/repository/ProductRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/ISMS/src/main/java/com/Group5/ISMS/repository/ProductRepository.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ISMS/src/main/java/com/Group5/ISMS/repository/StockMovementRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/ISMS/src/main/java/com/Group5/ISMS/repository/StockMovementRepository.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ISMS/src/main/java/com/Group5/ISMS/service/ProductService.java" beforeDir="false" afterPath="$PROJECT_DIR$/ISMS/src/main/java/com/Group5/ISMS/service/ProductService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ISMS/src/main/java/com/Group5/ISMS/service/StockMovementService.java" beforeDir="false" afterPath="$PROJECT_DIR$/ISMS/src/main/java/com/Group5/ISMS/service/StockMovementService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ISMS/src/main/java/com/Group5/ISMS/service/SupplierService.java" beforeDir="false" afterPath="$PROJECT_DIR$/ISMS/src/main/java/com/Group5/ISMS/service/SupplierService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ISMS/src/main/resources/static/js/products.js" beforeDir="false" afterPath="$PROJECT_DIR$/ISMS/src/main/resources/static/js/products.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ISMS/src/main/resources/static/js/stock.js" beforeDir="false" afterPath="$PROJECT_DIR$/ISMS/src/main/resources/static/js/stock.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ISMS/src/main/resources/templates/products.html" beforeDir="false" afterPath="$PROJECT_DIR$/ISMS/src/main/resources/templates/products.html" afterDir="false" />
-    </list>
+    <list default="true" id="be55eb0f-7b06-44d8-a548-894b33accc34" name="Changes" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -58,6 +43,21 @@
   &quot;fromUser&quot;: false
 }</component>
   <component name="ProjectId" id="3KoIgZWdvXH3Em0PNxtSBMhrqBa" />
+  <component name="ProjectSessionTemplates">
+    <option name="panelTemplate">
+      <template>
+        <option name="modeId" value="Agent" />
+        <option name="model">
+          <model>
+            <option name="modelType" value="builtin_id" />
+            <option name="modelValue" value="auto" />
+          </model>
+        </option>
+        <option name="targetType" value="BACKGROUND" />
+        <option name="worktreeMode" value="WORKSPACE" />
+      </template>
+    </option>
+  </component>
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
@@ -120,7 +120,7 @@
       <updated>1792217605687</updated>
       <workItem from="1792217606941" duration="1671000" />
       <workItem from="1792303077517" duration="3229000" />
-      <workItem from="1792373726307" duration="3158000" />
+      <workItem from="1792373726307" duration="4050000" />
     </task>
     <servers />
   </component>

@@ -1,4 +1,4 @@
-﻿# BẢNG ĐẶC TẢ TEST CASES
+# BẢNG ĐẶC TẢ TEST CASES
 ## HỆ THỐNG QUẢN LÝ TỒN KHO & NHÀ CUNG CẤP (ISMS)
 
 ---
@@ -58,9 +58,13 @@
 | TC_PROD_04 | Tạo sản phẩm không chọn nhà cung cấp | Negative | POST /api/products | `supplierId: null` | 400 Bad Request · `"Supplier is required for this product!"` |
 | TC_PROD_05 | Tên sản phẩm vượt 150 ký tự | Negative | POST /api/products | `productName: [160 ký tự]` | 400 Bad Request · `"Product name cannot exceed 150 characters!"` |
 | TC_PROD_06 | Cập nhật thông tin sản phẩm | Positive | PUT /api/products/{id} | Tên mới | 200 OK · tên cập nhật, tồn kho giữ nguyên |
-| TC_PROD_07 | Xóa sản phẩm còn tồn kho > 0 | Data Integrity | DELETE /api/products/{id} | id có `quantity_in_stock > 0` | 400 Bad Request · `"Cannot delete product... currently has X unit(s) in warehouse stock!"` |
-| TC_PROD_08 | Xóa mềm sản phẩm khi tồn kho = 0 | Data Integrity | DELETE /api/products/{id} | id có `quantity_in_stock = 0` | 200 OK · DB: `is_deleted = 1` · lịch sử phiếu kho vẫn còn |
+| TC_PROD_07 | Xóa sản phẩm chuyển vào Thùng rác (có tồn kho) | Data Integrity | DELETE /api/products/{id} | id có `quantity_in_stock > 0` | 200 OK · Cảnh báo tồn kho · chuyển sang tab Thùng rác (`is_deleted = 1`) |
+| TC_PROD_08 | Xóa mềm sản phẩm khi tồn kho = 0 | Data Integrity | DELETE /api/products/{id} | id có `quantity_in_stock = 0` | 200 OK · DB: `is_deleted = 1` · chuyển sang Thùng rác · lịch sử phiếu kho giữ nguyên |
 | TC_PROD_09 | Role USER tạo sản phẩm | Security | POST /api/products | Session role USER | 403 Forbidden · `"Access denied: Role 'USER' is restricted to read-only access."` |
+| TC_PROD_10 | Tạm ngưng kinh doanh sản phẩm (Suspend) | Positive | PATCH /api/products/{id}/status | id sản phẩm đang ACTIVE | 200 OK · `status = "SUSPENDED"` · badge hiển thị Suspended |
+| TC_PROD_11 | Kích hoạt lại sản phẩm (Reactivate) | Positive | PATCH /api/products/{id}/status | id sản phẩm đang SUSPENDED | 200 OK · `status = "ACTIVE"` · cho phép xuất nhập kho trở lại |
+| TC_PROD_12 | Xem danh sách Thùng rác (Recycle Bin) | Positive | GET /api/products/trash | Session hợp lệ | 200 OK · danh sách sản phẩm có `is_deleted = 1` |
+| TC_PROD_13 | Khôi phục sản phẩm từ Thùng rác (Restore) | Positive | PUT /api/products/{id}/restore | Body: `{"quantityInStock": 20}` | 200 OK · `is_deleted = 0`, `status = "ACTIVE"`, tồn kho cập nhật |
 
 ---
 
@@ -77,6 +81,7 @@
 | TC_STOCK_07 | Xóa phiếu và hoàn tác tồn kho | Data Integrity | DELETE /api/stock-movements/{id} | id phiếu nhập 20 | 200 OK · tồn kho giảm 20 · phiếu bị xóa mềm |
 | TC_STOCK_08 | Xóa phiếu gây âm tồn kho | Data Integrity | DELETE /api/stock-movements/{id} | Xóa phiếu nhập khi đã xuất gần hết | 400 Bad Request · `"Cannot delete this stock movement because it would cause warehouse stock... to become negative"` |
 | TC_STOCK_09 | Role USER tạo phiếu kho | Security | POST /api/stock-movements | Session role USER | 403 Forbidden |
+| TC_STOCK_10 | Chặn biến động kho với sản phẩm SUSPENDED | Negative | POST /api/stock-movements | `productId` của sản phẩm đang SUSPENDED | 400 Bad Request · `"Cannot perform stock movement on a suspended product! Please reactivate the product first."` |
 
 ---
 
@@ -112,8 +117,8 @@
 |---------|:------------:|:--------:|:--------:|:--------:|:--------------:|
 | Authentication | 10 | 4 | 3 | 2 | 1 |
 | Supplier | 10 | 4 | 3 | 1 | 2 |
-| Product | 9 | 4 | 2 | 1 | 2 |
-| Stock Movement | 9 | 3 | 2 | 1 | 3 |
+| Product | 13 | 8 | 2 | 1 | 2 |
+| Stock Movement | 10 | 3 | 3 | 1 | 3 |
 | User Management | 7 | 3 | 1 | 2 | 1 |
 | Security/Exception | 5 | 0 | 2 | 3 | 0 |
-| **TỔNG** | **50** | **18** | **13** | **10** | **9** |
+| **TỔNG** | **55** | **22** | **14** | **10** | **9** |

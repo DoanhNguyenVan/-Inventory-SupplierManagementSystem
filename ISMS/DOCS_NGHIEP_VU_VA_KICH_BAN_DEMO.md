@@ -47,7 +47,12 @@ ISMS giải quyết triệt để các vấn đề trên với 4 trụ cột ngh
 
 ```mermaid
 flowchart TD
-    Start([Nhân viên kho tạo phiếu]) --> Action{Loại giao dịch?}
+    Start([Nhân viên kho tạo phiếu]) --> CheckStatus{Trạng thái sản phẩm?}
+    
+    CheckStatus -- SUSPENDED Tạm ngưng --> BlockSuspended[Chặn giao dịch 400: Cannot perform movement on suspended product]
+    BlockSuspended --> Rollback1([Từ chối giao dịch & Giữ nguyên kho])
+
+    CheckStatus -- ACTIVE Đang bán --> Action{Loại giao dịch?}
     
     Action -- Nhập kho (+) --> AddStock[Tồn kho = Hiện tại + Số lượng nhập]
     AddStock --> SaveMove1[Lưu StockMovement]
@@ -59,16 +64,17 @@ flowchart TD
     SaveMove2 --> Done2([Cập nhật kho thành công])
     
     CheckStock -- Thiếu hàng --> ThrowErr[Ném lỗi 400: Insufficient stock]
-    ThrowErr --> Rollback([Từ chối giao dịch & Giữ nguyên kho])
+    ThrowErr --> Rollback2([Từ chối giao dịch & Giữ nguyên kho])
 ```
 
-### 3.2. Ba quy tắc nghiệp vụ quan trọng nhất (Cần nhấn mạnh khi demo)
+### 3.2. Bốn quy tắc nghiệp vụ quan trọng nhất (Cần nhấn mạnh khi demo)
 
 | Quy tắc | Bản chất kỹ thuật | Giá trị thực tế |
 | :--- | :--- | :--- |
-| **1. Stock Integrity (Toàn vẹn kho)** | Số lượng `quantity_in_stock` không có API sửa trực tiếp. Tạo mới sản phẩm luôn bắt đầu bằng `0`. Tồn kho = Tổng đại số lịch sử `StockMovement`. | Ngăn chặn gian lận số liệu kho của thủ kho. |
+| **1. Stock Integrity (Toàn vẹn kho)** | Số lượng `quantity_in_stock` ẩn trên form tạo/sửa. Tạo mới sản phẩm luôn bắt đầu bằng `0`. Tồn kho = Tổng đại số lịch sử `StockMovement`. | Ngăn chặn gian lận số liệu kho của thủ kho. |
 | **2. Insufficient Stock Guard** | Chặn xuất âm ở tầng Service và Database constraint. | Đảm bảo hệ thống phản ánh đúng thực tế hàng hóa vật lý. |
-| **3. Soft Delete & Audit Safety** | Sử dụng `@SQLDelete` và `@SQLRestriction("is_deleted = 0")`. Cột `is_deleted BIT`. | Dù người dùng xóa sản phẩm, đối tác hay phiếu kho, bản ghi gốc vẫn còn trong DB để phục vụ thanh tra, kiểm toán. |
+| **3. Suspended Product Guard** | Chặn mọi giao dịch xuất/nhập kho đối với sản phẩm tạm ngưng bán (`status = SUSPENDED`). | Đảm bảo hàng lỗi/hàng ngừng phân phối không bị xuất nhầm ra thị trường. |
+| **4. Recycle Bin & No Hard Delete** | Không có nút xóa vĩnh viễn. Xóa sản phẩm chuyển vào Thùng rác (`is_deleted = 1`). Có chức năng Restore khôi phục tồn kho. | Bảo vệ 100% dữ liệu lịch sử và chứng từ kế toán. |
 
 ---
 
@@ -129,23 +135,35 @@ flowchart TD
 5. **Thao tác 3 - Xuất kho hợp lệ**:
    - Nhập số lượng xuất: `-10`.
    - Hệ thống chấp nhận, tồn kho giảm chính xác về **40**.
+6. **Thao tác 4 - Chặn giao dịch khi sản phẩm bị Tạm ngưng bán (Suspended Guard)**:
+   - Vào **Products**, bấm **Suspend** một sản phẩm (ví dụ `Wireless Ergonomic Mouse`). Badge chuyển sang màu xám **Suspended**.
+   - Sang **Stock Movements** -> Bấm **Record Stock Movement**.
+   - Trong dropdown sản phẩm, sản phẩm bị Suspend đã được tự động loại bỏ (hoặc nếu gửi API trực tiếp thì hệ thống ném ngoại lệ 400: *"Cannot perform stock movement on a suspended product! Please reactivate the product first."*).
+7. 🎤 **Lời nói mẫu:**
+   - *"Đây là tính năng nghiệp vụ rất quan trọng: Khi một mặt hàng bị lỗi hàng loạt hoặc đang chờ kiểm định chất lượng, ta chỉ cần bấm Suspend (Tạm ngưng). Ngay lập tức, hệ thống sẽ phong tỏa, không cho phép bất kỳ ai xuất nhập kho mặt hàng này cho đến khi được Reactivate trở lại!"*
 
 ---
 
-### PHẦN 5: DEMO TÍNH NĂNG XÓA MỀM & TOÀN VẸN DỮ LIỆU (1.5 phút ⭐)
-1. **Thao tác**:
-   - Vào trang **Suppliers**, thử xóa nhà cung cấp `TechLink Distribution` (đang có sản phẩm màn hình).
-   - Hệ thống báo lỗi: *"Không thể xóa nhà cung cấp vì đang có sản phẩm liên kết!"*.
-2. 🎤 **Lời nói mẫu:**
-   > *"Về mặt bảo vệ dữ liệu, hệ thống không cho phép xóa nhà cung cấp đang có hàng trong kho. Ngoài ra, đối với các đối tác hoặc sản phẩm không còn kinh doanh, nhóm em đã áp dụng giải pháp **Xóa mềm (Soft Delete)** thông qua annotation `@SQLDelete` và `@SQLRestriction('is_deleted = 0')` của Hibernate 6."*
-3. 🎤 **Lời giải thích kỹ thuật:**
-   > *"Khi người dùng bấm Xóa, hệ thống chỉ cập nhật cờ `is_deleted = 1`. Trên giao diện người dùng, sản phẩm sẽ biến mất. Tuy nhiên, trong database SQL Server, bản ghi và toàn bộ lịch sử xuất nhập kho trong quá khứ vẫn được giữ nguyên 100%, phục vụ việc truy xuất kế toán và kiểm toán khi cần."*
+### PHẦN 5: DEMO QUẢN LÝ VÒNG ĐỜI SẢN PHẨM, THÙNG RÁC & KHÔI PHỤC (1.5 phút ⭐)
+1. **Thao tác 1 - Tạm ngưng (Suspend) & Kích hoạt lại (Reactivate)**:
+   - Trên bảng sản phẩm, bấm **Suspend** -> Trạng thái đổi thành **Suspended**, nút chuyển thành **Reactivate**.
+   - Bấm **Reactivate** -> Trạng thái lập tức trở về **Active**, sản phẩm lưu thông bình thường.
+2. **Thao tác 2 - Xóa vào Thùng rác (Recycle Bin - Không xóa vĩnh viễn)**:
+   - Bấm **Discontinue (Xóa)** một sản phẩm. Nếu sản phẩm còn tồn kho, hệ thống hiển thị hộp thoại cảnh báo: *"Sản phẩm này hiện còn X đơn vị trong kho. Bạn có chắc chắn muốn ngừng kinh doanh và chuyển vào thùng rác?"*.
+   - Bấm xác nhận -> Sản phẩm biến mất khỏi tab **Product List** và chuyển sang tab **Recycle Bin (Thùng rác)**.
+   - Thầy/Cô có thể thấy hệ thống **hoàn toàn không có nút Xóa vĩnh viễn (Hard Delete)**.
+3. **Thao tác 3 - Khôi phục từ Thùng rác (Restore with Stock Edit)**:
+   - Chuyển sang tab **Recycle Bin**, bấm nút **Restore**.
+   - Modal khôi phục hiện ra, cho phép thủ kho kiểm tra hoặc nhập lại số lượng tồn kho thực tế nếu kiểm kê có sai lệch.
+   - Bấm **Restore** -> Sản phẩm lập tức quay lại tab **Product List** với số lượng tồn kho đã đồng bộ.
+4. 🎤 **Lời nói mẫu:**
+   > *"Về mặt bảo vệ dữ liệu, ISMS tuân thủ nguyên tắc kế toán: Tuyệt đối không xóa cứng (Hard Delete) dữ liệu nghiệp vụ để tránh làm đứt gãy lịch sử phiếu kho. Mọi sản phẩm ngưng bán đều nằm trong Thùng rác và có thể phục hồi nguyên trạng bất cứ lúc nào."*
 
 ---
 
 ### PHẦN 6: KẾT LUẬN (30 giây)
 > 🎤 **Lời nói mẫu:**
-> *"Tóm lại, hệ thống ISMS không chỉ đáp ứng đầy đủ các chức năng quản lý danh mục và giao dịch kho, mà còn được hoàn thiện về mặt kiến trúc: bảo mật mật khẩu PBKDF2, bắt lỗi tập trung bằng GlobalExceptionHandler, ngăn chặn tấn công SQL Injection và lỗi tràn dữ liệu. Nhóm em xin chân thành cảm ơn Thầy/Cô đã lắng nghe và rất mong nhận được câu hỏi góp ý ạ!"*
+> *"Tóm lại, hệ thống ISMS không chỉ đáp ứng đầy đủ các chức năng quản lý danh mục và giao dịch kho, mà còn được hoàn thiện về mặt kiến trúc: bảo mật mật khẩu PBKDF2, bắt lỗi tập trung bằng GlobalExceptionHandler, ngăn chặn tấn công SQL Injection, giao diện hoàn toàn bằng tiếng Anh chuẩn quốc tế và kiểm soát chặt chẽ trạng thái vòng đời sản phẩm. Nhóm em xin chân thành cảm ơn Thầy/Cô đã lắng nghe và rất mong nhận được câu hỏi góp ý ạ!"*
 
 ---
 
@@ -162,3 +180,13 @@ flowchart TD
 #### ❓ Câu hỏi 3: "Nếu nhân viên xóa nhầm phiếu Nhập kho thì sao?"
 > **Trả lời:**
 > *"Dạ, hệ thống có cơ chế Hoàn tác tự động (`Reversion`). Khi xóa một phiếu kho, hệ thống sẽ lấy tồn kho hiện tại trừ đi lượng đã thay đổi của phiếu đó. Tuy nhiên, nếu lượng hàng của phiếu đó đã bị xuất bán hết dẫn đến việc hoàn tác làm âm kho (`revertedStock < 0`), hệ thống sẽ ném ngoại lệ chặn xóa ngay lập tức để bảo vệ số liệu kho không bị rách."*
+
+#### ❓ Câu hỏi 4: "Tại sao hệ thống không cung cấp nút Xóa vĩnh viễn (Hard Delete) sản phẩm?"
+> **Trả lời:**
+> *"Dạ thưa Thầy/Cô, trong các hệ thống ERP thực tế, sản phẩm luôn gắn liền với các chứng từ kế toán và phiếu kho trong quá khứ (`stock_movements`). Nếu cho phép xóa vĩnh viễn, hoặc là CSDL sẽ bị lỗi vi phạm khóa ngoại (Foreign Key Violation), hoặc nếu dùng `CASCADE DELETE` thì toàn bộ lịch sử xuất nhập kho của công ty sẽ bị xóa sạch, gây rách dữ liệu kiểm toán. Do đó, hệ thống chỉ cho phép đưa vào Thùng rác (Recycle Bin) và hỗ trợ Khôi phục (Restore), đảm bảo an toàn dữ liệu 100%."*
+
+#### ❓ Câu hỏi 5: "Sự khác biệt giữa Tạm ngưng bán (Suspend) và Xóa vào Thùng rác (Discontinue) là gì?"
+> **Trả lời:**
+> *"Dạ, hai trạng thái này phục vụ hai mục đích nghiệp vụ hoàn toàn khác nhau:
+> - **Suspend (Tạm ngưng bán):** Sản phẩm vẫn xuất hiện trên danh sách chính (`Product List`), nhưng bị khóa không cho phép xuất/nhập kho (dùng cho trường hợp hàng bị lỗi kỹ thuật, đang chờ kiểm định hoặc tạm hết giấy phép kinh doanh).
+> - **Discontinue / Thùng rác (`is_deleted = 1`):** Sản phẩm đã ngừng hẳn dòng đời sản phẩm, bị ẩn khỏi bảng chính và chuyển sang tab Thùng rác. Khi nào doanh nghiệp phân phối lại dòng sản phẩm này thì mới vào Thùng rác để Restore."*
