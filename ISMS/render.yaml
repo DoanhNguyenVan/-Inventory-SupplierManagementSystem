@@ -1,0 +1,15 @@
+services:
+  - type: web
+    name: isms-inventory
+    runtime: java
+    branch: main
+    rootDir: ISMS
+    plan: free
+    region: singapore
+    buildCommand: ./mvnw clean package -DskipTests
+    startCommand: java -jar target/ISMS-0.0.1-SNAPSHOT.jar
+    envVars:
+      - key: SPRING_DATASOURCE_URL
+        value: jdbc:h2:mem:ismsdb;DB_CLOSE_DELAY=-1;MODE=MSSQLServer
+      - key: SPRING_DATASOURCE_DRIVER
+        value: org.h2.Driver
