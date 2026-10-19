@@ -8,7 +8,6 @@ import java.time.LocalDateTime;
 @Entity
 @Table(name = "users")
 @SQLDelete(sql = "UPDATE users SET is_deleted = 1 WHERE user_id = ?")
-@SQLRestriction("is_deleted = 0")
 public class User {
 
     @Id

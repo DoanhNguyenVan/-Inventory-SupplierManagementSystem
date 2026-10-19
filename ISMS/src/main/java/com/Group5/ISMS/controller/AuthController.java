@@ -90,6 +90,9 @@ public class AuthController {
         } catch (IllegalArgumentException e) {
             model.addAttribute("error", e.getMessage());
             return "register";
+        } catch (org.springframework.dao.DataIntegrityViolationException e) {
+            model.addAttribute("error", "Username or email is already in use. Please use a different one.");
+            return "register";
         } catch (Exception e) {
             model.addAttribute("error", "Registration error: " + e.getMessage());
             return "register";
@@ -163,6 +166,8 @@ public class AuthController {
             return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.ok("Registration successful", createdUser));
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ApiResponse.error(e.getMessage()));
+        } catch (org.springframework.dao.DataIntegrityViolationException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ApiResponse.error("Username or email is already in use. Please use a different one."));
         }
     }
 

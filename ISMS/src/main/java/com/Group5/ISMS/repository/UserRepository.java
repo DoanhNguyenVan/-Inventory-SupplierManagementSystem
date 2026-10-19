@@ -2,6 +2,8 @@ package com.Group5.ISMS.repository;
 
 import com.Group5.ISMS.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -14,11 +16,27 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     Optional<User> findByEmail(String email);
 
+    Optional<User> findByUsernameAndIsDeletedFalse(String username);
+
+    Optional<User> findByEmailAndIsDeletedFalse(String email);
+
+    Optional<User> findByUserIdAndIsDeletedFalse(Long userId);
+
     boolean existsByUsername(String username);
 
     boolean existsByEmail(String email);
 
-    List<User> findByUsernameContainingIgnoreCaseOrFullNameContainingIgnoreCaseOrEmailContainingIgnoreCase(String username, String fullName, String email);
+    boolean existsByUsernameAndIsDeletedFalse(String username);
 
-    long countByRole(String role);
+    boolean existsByEmailAndIsDeletedFalse(String email);
+
+    List<User> findByIsDeletedFalse();
+
+    @Query("SELECT u FROM User u WHERE u.isDeleted = false AND (" +
+           "LOWER(u.username) LIKE LOWER(CONCAT('%', :kw, '%')) OR " +
+           "LOWER(u.fullName) LIKE LOWER(CONCAT('%', :kw, '%')) OR " +
+           "LOWER(u.email) LIKE LOWER(CONCAT('%', :kw, '%')))")
+    List<User> searchActiveUsers(@Param("kw") String keyword);
+
+    long countByRoleAndIsDeletedFalse(String role);
 }
